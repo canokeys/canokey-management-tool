@@ -1,0 +1,28 @@
+{
+  "homeScreenTitle": "CanoKey 管理工具",
+  "save": "保存",
+  "close": "关闭",
+
+  "openpgpPrompt": "请点击右上角刷新按钮读取 CanoKey",
+  "openpgpOldPinIncorrect": "旧 PIN 输入错误",
+  "openpgpCardInfo": "卡片信息",
+  "openpgpVersion": "版本",
+  "openpgpManufacturer": "制造商",
+  "openpgpSN": "序列号",
+  "openpgpCardHolder": "持卡人",
+  "openpgpPubkeyUrl": "公钥 URL",
+  "openpgpKeys": "密钥信息",
+  "openpgpSignature": "签名",
+  "openpgpEncryption": "加密",
+  "openpgpAuthentication": "认证",
+  "openpgpUIF": "交互设置",
+  "openpgpUifOff": "关闭",
+  "openpgpUifOn": "打开",
+  "openpgpUifPermanent": "永久启用",
+  "openpgpUifCacheTime": "触摸缓存时间",
+  "openpgpActions": "操作",
+  "openpgpChangePin": "修改 PIN",
+  "openpgpChangeAdminPin": "修改 Admin PIN",
+  "openpgpUifChanged": "交互行为修改成功",
+  "openpgpUifCacheTimeChanged": "触摸缓存时间修改成功"
+}

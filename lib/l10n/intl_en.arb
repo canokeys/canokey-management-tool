@@ -1,0 +1,28 @@
+{
+  "homeScreenTitle": "CanoKey Management Tool",
+  "save": "Save",
+  "close": "Close",
+
+  "openpgpPrompt": "Please read your CanoKey by clicking the refresh button",
+  "openpgpOldPinIncorrect": "Your old PIN is incorrect",
+  "openpgpCardInfo": "Card Info",
+  "openpgpVersion": "Version",
+  "openpgpManufacturer": "Manufacturer",
+  "openpgpSN": "Serial Number",
+  "openpgpCardHolder": "Card Holder",
+  "openpgpPubkeyUrl": "Public Key URL",
+  "openpgpKeys": "Keys",
+  "openpgpSignature": "Signature",
+  "openpgpEncryption": "Encryption",
+  "openpgpAuthentication": "Authentication",
+  "openpgpUIF": "User Interactions",
+  "openpgpUifOff": "Off",
+  "openpgpUifOn": "On",
+  "openpgpUifPermanent": "Permanent",
+  "openpgpUifCacheTime": "Touch Cache Time",
+  "openpgpActions": "Actions",
+  "openpgpChangePin": "Change PIN",
+  "openpgpChangeAdminPin": "Change Admin PIN",
+  "openpgpUifChanged": "Interaction has been successfully changed",
+  "openpgpUifCacheTimeChanged": "Touch cache time has been successfully changed"
+}

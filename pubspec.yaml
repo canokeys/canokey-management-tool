@@ -1,0 +1,72 @@
+name: canokey_management_tool
+description: CanoKey Management Tool
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  basic_utils: ^3.9.4
+  cupertino_icons: ^1.0.2
+  flutter_spinkit: ^5.0.0
+  bubble_bottom_bar: ^1.2.0
+  fluttertoast: ^7.1.1
+  convex_bottom_bar: ^3.0.0
+  curved_navigation_bar: ^0.3.7
+  foldable_sidebar: ^1.0.0
+  charts_flutter: ^0.10.0
+  flutter_staggered_grid_view: ^0.3.4
+  transparent_image: ^2.0.0
+  carousel_slider: ^3.0.0
+  carousel_pro: ^1.0.0
+  sticky_headers: ^0.2.0
+  animated_text_kit: ^2.5.1
+  flutter_polyline_points: ^0.2.3
+  url_launcher: ^6.0.3
+  flutter_colorpicker: ^0.4.0
+  badges: ^1.2.0
+  animate_icons: ^2.0.0
+  navigation_history_observer: ^1.1.0
+  intl: ^0.17.0
+  logging: ^1.0.2
+  flutter_nfc_kit:
+    git:
+      url: https://github.com/nfcim/flutter_nfc_kit.git
+      ref: webusb_support
+  
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+module:
+  androidX: true
+
+flutter:
+  uses-material-design: true
+  assets:
+   - assets/
+  fonts:
+    - family: Consolas
+      fonts:
+        - asset: fonts/consolas/consolas.ttf
+    - family: Montserrat
+      fonts:
+        - asset: fonts/montserrat/Montserrat-Regular.ttf
+        - asset: fonts/montserrat/Montserrat-Bold.ttf
+          weight: 700
+        - asset: fonts/montserrat/Montserrat-SemiBold.ttf
+          weight: 600
+        - asset: fonts/montserrat/Montserrat-Medium.ttf
+          weight: 500
+        - asset: fonts/montserrat/Montserrat-Light.ttf
+          weight: 300
+
+flutter_intl:
+  enabled: true
