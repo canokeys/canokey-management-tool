@@ -65,21 +65,111 @@ class S {
     );
   }
 
-  /// `Please read your CanoKey by clicking the refresh button`
-  String get openpgpPrompt {
+  /// `No CanoKey is selected.`
+  String get pollCanceled {
     return Intl.message(
-      'Please read your CanoKey by clicking the refresh button',
-      name: 'openpgpPrompt',
+      'No CanoKey is selected.',
+      name: 'pollCanceled',
       desc: '',
       args: [],
     );
   }
 
-  /// `Your old PIN is incorrect`
-  String get openpgpOldPinIncorrect {
+  /// `CanoKey is busy. Replug it, wait for a moment, and retry.`
+  String get networkError {
     return Intl.message(
-      'Your old PIN is incorrect',
-      name: 'openpgpOldPinIncorrect',
+      'CanoKey is busy. Replug it, wait for a moment, and retry.',
+      name: 'networkError',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This applet has been locked.`
+  String get appletLocked {
+    return Intl.message(
+      'This applet has been locked.',
+      name: 'appletLocked',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Incorrect PIN.`
+  String get pinIncorrect {
+    return Intl.message(
+      'Incorrect PIN.',
+      name: 'pinIncorrect',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Incorrect PIN. {retries} retries left.`
+  String pinRetries(Object retries) {
+    return Intl.message(
+      'Incorrect PIN. $retries retries left.',
+      name: 'pinRetries',
+      desc: '',
+      args: [retries],
+    );
+  }
+
+  /// `The provided PIN is too short or too long.`
+  String get pinLength {
+    return Intl.message(
+      'The provided PIN is too short or too long.',
+      name: 'pinLength',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `seconds`
+  String get seconds {
+    return Intl.message(
+      'seconds',
+      name: 'seconds',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Change`
+  String get change {
+    return Intl.message(
+      'Change',
+      name: 'change',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Old PIN`
+  String get oldPin {
+    return Intl.message(
+      'Old PIN',
+      name: 'oldPin',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `New PIN`
+  String get newPin {
+    return Intl.message(
+      'New PIN',
+      name: 'newPin',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please read your CanoKey by clicking the refresh button`
+  String get openpgpPrompt {
+    return Intl.message(
+      'Please read your CanoKey by clicking the refresh button',
+      name: 'openpgpPrompt',
       desc: '',
       args: [],
     );
@@ -185,10 +275,10 @@ class S {
     );
   }
 
-  /// `User Interactions`
+  /// `Touch Policies`
   String get openpgpUIF {
     return Intl.message(
-      'User Interactions',
+      'Touch Policies',
       name: 'openpgpUIF',
       desc: '',
       args: [],
@@ -215,10 +305,10 @@ class S {
     );
   }
 
-  /// `Permanent`
+  /// `Permanent (Cannot turn off)`
   String get openpgpUifPermanent {
     return Intl.message(
-      'Permanent',
+      'Permanent (Cannot turn off)',
       name: 'openpgpUifPermanent',
       desc: '',
       args: [],
@@ -265,21 +355,81 @@ class S {
     );
   }
 
-  /// `Interaction has been successfully changed`
+  /// `Change Touch Cache Time`
+  String get openpgpChangeTouchCacheTime {
+    return Intl.message(
+      'Change Touch Cache Time',
+      name: 'openpgpChangeTouchCacheTime',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `PIN has been successfully changed.`
+  String get openpgpPinChanged {
+    return Intl.message(
+      'PIN has been successfully changed.',
+      name: 'openpgpPinChanged',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Touch policy has been successfully changed.`
   String get openpgpUifChanged {
     return Intl.message(
-      'Interaction has been successfully changed',
+      'Touch policy has been successfully changed.',
       name: 'openpgpUifChanged',
       desc: '',
       args: [],
     );
   }
 
-  /// `Touch cache time has been successfully changed`
+  /// `Touch cache time has been successfully changed.`
   String get openpgpUifCacheTimeChanged {
     return Intl.message(
-      'Touch cache time has been successfully changed',
+      'Touch cache time has been successfully changed.',
       name: 'openpgpUifCacheTimeChanged',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Change {keyType} Key's Touch Policy`
+  String openpgpChangeInteraction(Object keyType) {
+    return Intl.message(
+      'Change $keyType Key\'s Touch Policy',
+      name: 'openpgpChangeInteraction',
+      desc: '',
+      args: [keyType],
+    );
+  }
+
+  /// `[none]`
+  String get openpgpKeyNone {
+    return Intl.message(
+      '[none]',
+      name: 'openpgpKeyNone',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `New PIN should be at least {min} characters long. The maximum length is 64.`
+  String openpgpChangePinPrompt(Object min) {
+    return Intl.message(
+      'New PIN should be at least $min characters long. The maximum length is 64.',
+      name: 'openpgpChangePinPrompt',
+      desc: '',
+      args: [min],
+    );
+  }
+
+  /// `Invalid length`
+  String get openpgpPinInvalidLength {
+    return Intl.message(
+      'Invalid length',
+      name: 'openpgpPinInvalidLength',
       desc: '',
       args: [],
     );

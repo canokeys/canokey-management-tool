@@ -33,11 +33,7 @@ class MyApp extends StatelessWidget {
       supportedLocales: S.delegate.supportedLocales,
       locale: Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans'),
       onGenerateTitle: (context) => S.of(context).homeScreenTitle,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-        fontFamily: 'Montserrat',
-      ),
+      theme: ThemeData(primarySwatch: Colors.blue, visualDensity: VisualDensity.adaptivePlatformDensity),
       debugShowCheckedModeBanner: false,
       home: Home(),
       navigatorObservers: [NavigationHistoryObserver()],
