@@ -27,14 +27,19 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
+    "actions" : MessageLookupByLibrary.simpleMessage("操作"),
     "appletLocked" : MessageLookupByLibrary.simpleMessage("该应用已被锁定"),
+    "cancel" : MessageLookupByLibrary.simpleMessage("取消"),
     "change" : MessageLookupByLibrary.simpleMessage("修改"),
     "close" : MessageLookupByLibrary.simpleMessage("关闭"),
+    "confirm" : MessageLookupByLibrary.simpleMessage("确定"),
+    "home" : MessageLookupByLibrary.simpleMessage("首页"),
     "homeScreenTitle" : MessageLookupByLibrary.simpleMessage("CanoKey 管理工具"),
     "networkError" : MessageLookupByLibrary.simpleMessage("CanoKey 繁忙，请重新插拔并稍后再试"),
     "newPin" : MessageLookupByLibrary.simpleMessage("新 PIN"),
+    "off" : MessageLookupByLibrary.simpleMessage("关"),
     "oldPin" : MessageLookupByLibrary.simpleMessage("旧 PIN"),
-    "openpgpActions" : MessageLookupByLibrary.simpleMessage("操作"),
+    "on" : MessageLookupByLibrary.simpleMessage("开"),
     "openpgpAuthentication" : MessageLookupByLibrary.simpleMessage("认证"),
     "openpgpCardHolder" : MessageLookupByLibrary.simpleMessage("持卡人"),
     "openpgpCardInfo" : MessageLookupByLibrary.simpleMessage("卡片信息"),
@@ -49,7 +54,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "openpgpManufacturer" : MessageLookupByLibrary.simpleMessage("制造商"),
     "openpgpPinChanged" : MessageLookupByLibrary.simpleMessage("PIN 修改成功"),
     "openpgpPinInvalidLength" : MessageLookupByLibrary.simpleMessage("长度错误"),
-    "openpgpPrompt" : MessageLookupByLibrary.simpleMessage("请点击右上角刷新按钮读取 CanoKey"),
     "openpgpPubkeyUrl" : MessageLookupByLibrary.simpleMessage("公钥 URL"),
     "openpgpSN" : MessageLookupByLibrary.simpleMessage("序列号"),
     "openpgpSignature" : MessageLookupByLibrary.simpleMessage("签名"),
@@ -65,7 +69,23 @@ class MessageLookup extends MessageLookupByLibrary {
     "pinLength" : MessageLookupByLibrary.simpleMessage("输入的 PIN 长度错误"),
     "pinRetries" : m2,
     "pollCanceled" : MessageLookupByLibrary.simpleMessage("您没有选择任何 CanoKey"),
+    "pollCanoKey" : MessageLookupByLibrary.simpleMessage("请点击右上角刷新按钮读取 CanoKey"),
     "save" : MessageLookupByLibrary.simpleMessage("保存"),
-    "seconds" : MessageLookupByLibrary.simpleMessage("秒")
+    "seconds" : MessageLookupByLibrary.simpleMessage("秒"),
+    "settings" : MessageLookupByLibrary.simpleMessage("设置"),
+    "settingsChipId" : MessageLookupByLibrary.simpleMessage("芯片 ID"),
+    "settingsFirmwareVersion" : MessageLookupByLibrary.simpleMessage("固件版本"),
+    "settingsHotp" : MessageLookupByLibrary.simpleMessage("触摸时输出 HOTP"),
+    "settingsInfo" : MessageLookupByLibrary.simpleMessage("CanoKey 信息"),
+    "settingsInputPin" : MessageLookupByLibrary.simpleMessage("PIN 验证"),
+    "settingsInputPinPrompt" : MessageLookupByLibrary.simpleMessage("请输入您的 PIN（默认值为 123456）。请注意，该 PIN 与其他应用的 PIN 无关。"),
+    "settingsLanguage" : MessageLookupByLibrary.simpleMessage("语言"),
+    "settingsModel" : MessageLookupByLibrary.simpleMessage("型号"),
+    "settingsNDEF" : MessageLookupByLibrary.simpleMessage("NFC 标签模式 (NDEF)"),
+    "settingsNDEFReadonly" : MessageLookupByLibrary.simpleMessage("NFC 标签只读"),
+    "settingsOtherSettings" : MessageLookupByLibrary.simpleMessage("其他设置"),
+    "settingsReset" : MessageLookupByLibrary.simpleMessage("重置"),
+    "settingsSN" : MessageLookupByLibrary.simpleMessage("序号"),
+    "settingsWebUSB" : MessageLookupByLibrary.simpleMessage("插入时 WebUSB 提示")
   };
 }

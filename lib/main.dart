@@ -3,17 +3,20 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:logging/logging.dart';
 import 'package:navigation_history_observer/navigation_history_observer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'components/openpgp.dart';
+import 'components/settings.dart';
 import 'generated/l10n.dart';
 import 'home.dart';
 import 'routes.dart';
 
-void main() {
+main() {
   Logger.root.level = Level.ALL; // defaults to Level.INFO
   Logger.root.onRecord.listen((record) {
     print('${record.level.name}: ${record.time}: ${record.message}');
   });
+  // SharedPreferences prefs = await SharedPreferences.getInstance();
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then((_) {
     runApp(MyApp());
@@ -38,7 +41,8 @@ class MyApp extends StatelessWidget {
       home: Home(),
       navigatorObservers: [NavigationHistoryObserver()],
       routes: {
-        Routes.openpgp: (context) => OpenPGP(),
+        Routes.openpgp: (_) => OpenPGP(),
+        Routes.settings: (_) => Settings(),
       },
     );
   }

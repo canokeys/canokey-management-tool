@@ -27,14 +27,19 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
+    "actions" : MessageLookupByLibrary.simpleMessage("Actions"),
     "appletLocked" : MessageLookupByLibrary.simpleMessage("This applet has been locked."),
+    "cancel" : MessageLookupByLibrary.simpleMessage("Cancel"),
     "change" : MessageLookupByLibrary.simpleMessage("Change"),
     "close" : MessageLookupByLibrary.simpleMessage("Close"),
+    "confirm" : MessageLookupByLibrary.simpleMessage("Confirm"),
+    "home" : MessageLookupByLibrary.simpleMessage("Home"),
     "homeScreenTitle" : MessageLookupByLibrary.simpleMessage("CanoKey Management Tool"),
     "networkError" : MessageLookupByLibrary.simpleMessage("CanoKey is busy. Replug it, wait for a moment, and retry."),
     "newPin" : MessageLookupByLibrary.simpleMessage("New PIN"),
+    "off" : MessageLookupByLibrary.simpleMessage("Off"),
     "oldPin" : MessageLookupByLibrary.simpleMessage("Old PIN"),
-    "openpgpActions" : MessageLookupByLibrary.simpleMessage("Actions"),
+    "on" : MessageLookupByLibrary.simpleMessage("On"),
     "openpgpAuthentication" : MessageLookupByLibrary.simpleMessage("Authentication"),
     "openpgpCardHolder" : MessageLookupByLibrary.simpleMessage("Card Holder"),
     "openpgpCardInfo" : MessageLookupByLibrary.simpleMessage("Card Info"),
@@ -49,7 +54,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "openpgpManufacturer" : MessageLookupByLibrary.simpleMessage("Manufacturer"),
     "openpgpPinChanged" : MessageLookupByLibrary.simpleMessage("PIN has been successfully changed."),
     "openpgpPinInvalidLength" : MessageLookupByLibrary.simpleMessage("Invalid length"),
-    "openpgpPrompt" : MessageLookupByLibrary.simpleMessage("Please read your CanoKey by clicking the refresh button"),
     "openpgpPubkeyUrl" : MessageLookupByLibrary.simpleMessage("Public Key URL"),
     "openpgpSN" : MessageLookupByLibrary.simpleMessage("Serial Number"),
     "openpgpSignature" : MessageLookupByLibrary.simpleMessage("Signature"),
@@ -65,7 +69,23 @@ class MessageLookup extends MessageLookupByLibrary {
     "pinLength" : MessageLookupByLibrary.simpleMessage("The provided PIN is too short or too long."),
     "pinRetries" : m2,
     "pollCanceled" : MessageLookupByLibrary.simpleMessage("No CanoKey is selected."),
+    "pollCanoKey" : MessageLookupByLibrary.simpleMessage("Please read your CanoKey by clicking the refresh button"),
     "save" : MessageLookupByLibrary.simpleMessage("Save"),
-    "seconds" : MessageLookupByLibrary.simpleMessage("seconds")
+    "seconds" : MessageLookupByLibrary.simpleMessage("seconds"),
+    "settings" : MessageLookupByLibrary.simpleMessage("Settings"),
+    "settingsChipId" : MessageLookupByLibrary.simpleMessage("Chip ID"),
+    "settingsFirmwareVersion" : MessageLookupByLibrary.simpleMessage("Firmware Version"),
+    "settingsHotp" : MessageLookupByLibrary.simpleMessage("Input HOTP when touching"),
+    "settingsInfo" : MessageLookupByLibrary.simpleMessage("CanoKey Info"),
+    "settingsInputPin" : MessageLookupByLibrary.simpleMessage("PIN Verification"),
+    "settingsInputPinPrompt" : MessageLookupByLibrary.simpleMessage("Please input your PIN. The default value is 123456. This PIN is irrelevant to other applets."),
+    "settingsLanguage" : MessageLookupByLibrary.simpleMessage("Language"),
+    "settingsModel" : MessageLookupByLibrary.simpleMessage("Model"),
+    "settingsNDEF" : MessageLookupByLibrary.simpleMessage("NFC Tag Mode (NDEF)"),
+    "settingsNDEFReadonly" : MessageLookupByLibrary.simpleMessage("NFC Tag Readonly"),
+    "settingsOtherSettings" : MessageLookupByLibrary.simpleMessage("Other Settings"),
+    "settingsReset" : MessageLookupByLibrary.simpleMessage("Reset"),
+    "settingsSN" : MessageLookupByLibrary.simpleMessage("Serial Number"),
+    "settingsWebUSB" : MessageLookupByLibrary.simpleMessage("WebUSB prompt when plug-in")
   };
 }

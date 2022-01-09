@@ -45,6 +45,26 @@ class S {
     );
   }
 
+  /// `Home`
+  String get home {
+    return Intl.message(
+      'Home',
+      name: 'home',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Settings`
+  String get settings {
+    return Intl.message(
+      'Settings',
+      name: 'settings',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Save`
   String get save {
     return Intl.message(
@@ -60,6 +80,16 @@ class S {
     return Intl.message(
       'Close',
       name: 'close',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please read your CanoKey by clicking the refresh button`
+  String get pollCanoKey {
+    return Intl.message(
+      'Please read your CanoKey by clicking the refresh button',
+      name: 'pollCanoKey',
       desc: '',
       args: [],
     );
@@ -165,11 +195,51 @@ class S {
     );
   }
 
-  /// `Please read your CanoKey by clicking the refresh button`
-  String get openpgpPrompt {
+  /// `Actions`
+  String get actions {
     return Intl.message(
-      'Please read your CanoKey by clicking the refresh button',
-      name: 'openpgpPrompt',
+      'Actions',
+      name: 'actions',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cancel`
+  String get cancel {
+    return Intl.message(
+      'Cancel',
+      name: 'cancel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Confirm`
+  String get confirm {
+    return Intl.message(
+      'Confirm',
+      name: 'confirm',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `On`
+  String get on {
+    return Intl.message(
+      'On',
+      name: 'on',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Off`
+  String get off {
+    return Intl.message(
+      'Off',
+      name: 'off',
       desc: '',
       args: [],
     );
@@ -325,16 +395,6 @@ class S {
     );
   }
 
-  /// `Actions`
-  String get openpgpActions {
-    return Intl.message(
-      'Actions',
-      name: 'openpgpActions',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Change PIN`
   String get openpgpChangePin {
     return Intl.message(
@@ -430,6 +490,146 @@ class S {
     return Intl.message(
       'Invalid length',
       name: 'openpgpPinInvalidLength',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `CanoKey Info`
+  String get settingsInfo {
+    return Intl.message(
+      'CanoKey Info',
+      name: 'settingsInfo',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Other Settings`
+  String get settingsOtherSettings {
+    return Intl.message(
+      'Other Settings',
+      name: 'settingsOtherSettings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Language`
+  String get settingsLanguage {
+    return Intl.message(
+      'Language',
+      name: 'settingsLanguage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reset`
+  String get settingsReset {
+    return Intl.message(
+      'Reset',
+      name: 'settingsReset',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Model`
+  String get settingsModel {
+    return Intl.message(
+      'Model',
+      name: 'settingsModel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Firmware Version`
+  String get settingsFirmwareVersion {
+    return Intl.message(
+      'Firmware Version',
+      name: 'settingsFirmwareVersion',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Serial Number`
+  String get settingsSN {
+    return Intl.message(
+      'Serial Number',
+      name: 'settingsSN',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Chip ID`
+  String get settingsChipId {
+    return Intl.message(
+      'Chip ID',
+      name: 'settingsChipId',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `PIN Verification`
+  String get settingsInputPin {
+    return Intl.message(
+      'PIN Verification',
+      name: 'settingsInputPin',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please input your PIN. The default value is 123456. This PIN is irrelevant to other applets.`
+  String get settingsInputPinPrompt {
+    return Intl.message(
+      'Please input your PIN. The default value is 123456. This PIN is irrelevant to other applets.',
+      name: 'settingsInputPinPrompt',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Input HOTP when touching`
+  String get settingsHotp {
+    return Intl.message(
+      'Input HOTP when touching',
+      name: 'settingsHotp',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `WebUSB prompt when plug-in`
+  String get settingsWebUSB {
+    return Intl.message(
+      'WebUSB prompt when plug-in',
+      name: 'settingsWebUSB',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `NFC Tag Mode (NDEF)`
+  String get settingsNDEF {
+    return Intl.message(
+      'NFC Tag Mode (NDEF)',
+      name: 'settingsNDEF',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `NFC Tag Readonly`
+  String get settingsNDEFReadonly {
+    return Intl.message(
+      'NFC Tag Readonly',
+      name: 'settingsNDEFReadonly',
       desc: '',
       args: [],
     );

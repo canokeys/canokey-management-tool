@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'drawer.dart';
+import 'generated/l10n.dart';
 
 class Home extends StatelessWidget {
   static const String routeName = '/';
@@ -12,7 +13,7 @@ class Home extends StatelessWidget {
         backgroundColor: Colors.indigo,
         titleSpacing: 0.0,
         centerTitle: true,
-        title: Text('CanoKey Management Tool', style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.white)),
+        title: Text(S.of(context).homeScreenTitle, style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.white)),
       ),
       drawer: AppDrawer(),
       body: Center(
