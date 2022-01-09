@@ -1,9 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_web_frame/flutter_web_frame.dart';
 import 'package:logging/logging.dart';
 import 'package:navigation_history_observer/navigation_history_observer.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'components/openpgp.dart';
 import 'components/settings.dart';
@@ -26,24 +27,31 @@ main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      localizationsDelegates: [
-        S.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: S.delegate.supportedLocales,
-      locale: Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans'),
-      onGenerateTitle: (context) => S.of(context).homeScreenTitle,
-      theme: ThemeData(primarySwatch: Colors.blue, visualDensity: VisualDensity.adaptivePlatformDensity),
-      debugShowCheckedModeBanner: false,
-      home: Home(),
-      navigatorObservers: [NavigationHistoryObserver()],
-      routes: {
-        Routes.openpgp: (_) => OpenPGP(),
-        Routes.settings: (_) => Settings(),
+    return FlutterWebFrame(
+      builder: (context) {
+        return MaterialApp(
+          localizationsDelegates: [
+            S.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: S.delegate.supportedLocales,
+          locale: Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans'),
+          onGenerateTitle: (context) => S.of(context).homeScreenTitle,
+          theme: ThemeData(primarySwatch: Colors.blue, visualDensity: VisualDensity.adaptivePlatformDensity),
+          debugShowCheckedModeBanner: false,
+          home: Home(),
+          navigatorObservers: [NavigationHistoryObserver()],
+          routes: {
+            Routes.openpgp: (_) => OpenPGP(),
+            Routes.settings: (_) => Settings(),
+          },
+        );
       },
+      maximumSize: Size(1200.0, 2160.0),
+      enabled: kIsWeb,
+      backgroundColor: Colors.grey,
     );
   }
 }
