@@ -1,3 +1,4 @@
+import 'package:another_flushbar/flushbar.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
@@ -6,6 +7,7 @@ import 'package:logging/logging.dart';
 import '../drawer.dart';
 import '../generated/l10n.dart';
 import '../utils/commons.dart';
+import 'openpgp.dart';
 
 final log = Logger('ManagementTool:Settings');
 
@@ -49,21 +51,38 @@ class _SettingsState extends State<Settings> {
               _itemTile(width, Icons.info, S.of(context).settingsFirmwareVersion, _key.firmwareVersion),
               _itemTile(width, Icons.vpn_key, S.of(context).settingsSN, _key.sn),
               _itemTile(width, Icons.memory, S.of(context).settingsChipId, _key.chipId),
-              _itemTile(width, Icons.light_mode, 'LED', _key.ledOn ? S.of(context).on : S.of(context).off),
-              _itemTile(width, Icons.keyboard_alt_outlined, S.of(context).settingsHotp, _key.hotpOn ? S.of(context).on : S.of(context).off),
-              if (_key.functionSet() == FunctionSet.v2)
-                _itemTile(width, Icons.web, S.of(context).settingsWebUSB, _key.webusbLandingEnabled ? S.of(context).on : S.of(context).off),
-              if (_key.functionSet() == FunctionSet.v2)
-                _itemTile(width, Icons.nfc, S.of(context).settingsNDEF, _key.ndefEnabled ? S.of(context).on : S.of(context).off),
-              _itemTile(width, Icons.brush, S.of(context).settingsNDEFReadonly, _key.ndefReadonly ? S.of(context).on : S.of(context).off),
-              if (_key.functionSet() == FunctionSet.v1) ...[
+
+              SizedBox(height: 25.0),
+              Text(S.of(context).settings, style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold)),
+              SizedBox(height: 15.0),
+              if (_key.functionSet().contains(Func.led))
+                _itemTile(width, Icons.light_mode, 'LED', _key.ledOn ? S.of(context).on : S.of(context).off,
+                    () => _showChangeSwitchDialog('LED', Func.led, _key.ledOn)),
+              if (_key.functionSet().contains(Func.hotp))
+                _itemTile(width, Icons.keyboard_alt_outlined, S.of(context).settingsHotp, _key.hotpOn ? S.of(context).on : S.of(context).off,
+                        () => _showChangeSwitchDialog(S.of(context).settingsHotp, Func.hotp, _key.hotpOn)),
+              if (_key.functionSet().contains(Func.webusbLandingPage))
+                _itemTile(width, Icons.web, S.of(context).settingsWebUSB, _key.webusbLandingEnabled ? S.of(context).on : S.of(context).off,
+                        () => _showChangeSwitchDialog(S.of(context).settingsWebUSB, Func.webusbLandingPage, _key.webusbLandingEnabled)),
+              if (_key.functionSet().contains(Func.ndefEnabled))
+                _itemTile(width, Icons.nfc, S.of(context).settingsNDEF, _key.ndefEnabled ? S.of(context).on : S.of(context).off,
+                        () => _showChangeSwitchDialog(S.of(context).settingsNDEF, Func.ndefEnabled, _key.ndefEnabled)),
+              if (_key.functionSet().contains(Func.ndefReadonly))
+                _itemTile(width, Icons.brush, S.of(context).settingsNDEFReadonly, _key.ndefReadonly ? S.of(context).on : S.of(context).off,
+                        () => _showChangeSwitchDialog(S.of(context).settingsNDEFReadonly, Func.ndefReadonly, _key.ndefReadonly)),
+
+              if (_key.functionSet().contains(Func.sigTouch)) ...[ // OpenPGP options work together
                 SizedBox(height: 25.0),
                 Text('OpenPGP ' + S.of(context).openpgpUIF, style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold)),
                 SizedBox(height: 15.0),
-                _itemTile(width, Icons.brush, S.of(context).openpgpSignature, _key.sigTouch ? S.of(context).on : S.of(context).off),
-                _itemTile(width, Icons.brush, S.of(context).openpgpEncryption, _key.decTouch ? S.of(context).on : S.of(context).off),
-                _itemTile(width, Icons.brush, S.of(context).openpgpAuthentication, _key.autTouch ? S.of(context).on : S.of(context).off),
-                _itemTile(width, Icons.brush, S.of(context).openpgpUifCacheTime, _key.touchCacheTime.toString()),
+                _itemTile(width, Icons.brush, S.of(context).openpgpSignature, _key.sigTouch ? S.of(context).on : S.of(context).off,
+                        () => _showChangeSwitchDialog('LED', Func.led, _key.ledOn)),
+                _itemTile(width, Icons.brush, S.of(context).openpgpEncryption, _key.decTouch ? S.of(context).on : S.of(context).off,
+                        () => _showChangeSwitchDialog('LED', Func.led, _key.ledOn)),
+                _itemTile(width, Icons.brush, S.of(context).openpgpAuthentication, _key.autTouch ? S.of(context).on : S.of(context).off,
+                        () => _showChangeSwitchDialog('LED', Func.led, _key.ledOn)),
+                _itemTile(width, Icons.brush, S.of(context).openpgpUifCacheTime, _key.touchCacheTime.toString(),
+                    () => OpenPGPState.showChangeCacheTimeDialog(context, 'PIN', (time, pin) => _changeTouchCacheTime(time, pin))),
               ]
             ],
             Text(S.of(context).actions, style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold)),
@@ -146,6 +165,123 @@ class _SettingsState extends State<Settings> {
     );
   }
 
+  void _showChangeSwitchDialog(String title, Func function, bool currentStatus) {
+    final pinController = TextEditingController();
+    bool tap = true;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) {
+        return StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
+          item(bool status) {
+            return InkWell(
+              onTap: () => setState(() => currentStatus = status),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  if (currentStatus == status) Icon(Icons.check, size: 28.0, color: Colors.indigo[500]) else SizedBox(width: 28.0, height: 28.0),
+                  SizedBox(width: 20.0),
+                  Text(status ? S.of(context).on : S.of(context).off, style: TextStyle(fontWeight: FontWeight.bold)),
+                ],
+              ),
+            );
+          }
+
+          divider() {
+            return Container(width: double.infinity, height: 1.0, color: Colors.grey);
+          }
+
+          return Dialog(
+            elevation: 0.0,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+            child: Wrap(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(20.0),
+                  child: Center(
+                    child: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                ),
+                divider(),
+                Container(
+                  padding: EdgeInsets.all(20.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      item(true),
+                      SizedBox(height: 10.0),
+                      item(false),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.only(bottom: 20.0, left: 20.0, right: 20.0),
+                  child: TextField(
+                    controller: pinController,
+                    obscureText: tap,
+                    decoration: InputDecoration(
+                      labelText: 'PIN',
+                      hintText: 'PIN',
+                      border: InputBorder.none,
+                      prefixIcon: Icon(Icons.lock_outlined, color: Colors.indigo[500]),
+                      suffixIcon: IconButton(
+                        onPressed: () => setState(() => tap = !tap),
+                        icon: tap
+                            ? Icon(Icons.remove_red_eye_outlined, color: Colors.indigo[500])
+                            : Icon(Icons.visibility_off_outlined, color: Colors.indigo[500]),
+                      ),
+                    ),
+                  ),
+                ),
+                divider(),
+                Container(
+                  padding: EdgeInsets.all(20.0),
+                  margin: EdgeInsets.only(left: 30.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      InkWell(
+                        onTap: () => _changeSwitch(function, currentStatus, pinController.text),
+                        borderRadius: BorderRadius.circular(30.0),
+                        child: Material(
+                          elevation: 1.0,
+                          borderRadius: BorderRadius.circular(30.0),
+                          child: Container(
+                            padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(30.0), color: Colors.indigo),
+                            child: Text(S.of(context).save, style: TextStyle(color: Colors.white, fontSize: 15.0, fontWeight: FontWeight.bold)),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 15.0),
+                      InkWell(
+                        onTap: () => Navigator.pop(context),
+                        borderRadius: BorderRadius.circular(30.0),
+                        child: Material(
+                          elevation: 1.0,
+                          borderRadius: BorderRadius.circular(30.0),
+                          child: Container(
+                            padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(30.0), color: Colors.indigo[100]),
+                            child: Text(S.of(context).close, style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold)),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+      },
+    );
+  }
+
   void _showInputPinDialog() {
     final pinController = TextEditingController();
     bool tapPin = true;
@@ -181,8 +317,8 @@ class _SettingsState extends State<Settings> {
                     controller: pinController,
                     obscureText: tapPin,
                     decoration: InputDecoration(
-                      labelText: "PIN",
-                      hintText: "PIN",
+                      labelText: 'PIN',
+                      hintText: 'PIN',
                       border: InputBorder.none,
                       prefixIcon: Icon(Icons.lock_outlined, color: Colors.indigo[500]),
                       suffixIcon: IconButton(
@@ -203,7 +339,10 @@ class _SettingsState extends State<Settings> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       InkWell(
-                        onTap: () => _refresh(pinController.text),
+                        onTap: () {
+                          Navigator.pop(context);
+                          _refresh(pinController.text);
+                        },
                         borderRadius: BorderRadius.circular(30.0),
                         child: Material(
                           elevation: 1.0,
@@ -256,7 +395,7 @@ class _SettingsState extends State<Settings> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    Text("警告", style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text('警告', style: TextStyle(fontWeight: FontWeight.bold)),
                     Divider(color: Colors.black),
                     SizedBox(height: 10.0),
                     Text('即将抹除全部数据。当您确认后，CanoKey 将会反复闪烁，请在闪烁时触摸，直到提示成功。'),
@@ -389,7 +528,6 @@ class _SettingsState extends State<Settings> {
   }
 
   void _refresh(String pin) async {
-    Navigator.pop(context);
     Commons.process(context, () async {
       Commons.assertOK(await FlutterNfcKit.transceive('00A4040005F000000000'));
       String resp = await FlutterNfcKit.transceive('0031000000');
@@ -410,15 +548,15 @@ class _SettingsState extends State<Settings> {
         return;
       }
       // read configurations
-      bool ledOn = false; // V1 & V2
-      bool hotpOn = false; // V1 & V2
-      bool ndefReadonly = false; // V1 & V2
-      bool ndefEnabled = false; // V2
-      bool webusbLandingEnabled = false; // V2
-      bool sigTouch = false; // V1
-      bool decTouch = false; // V1
-      bool autTouch = false; // V1
-      int cacheTime = 0; // V1
+      bool ledOn = false;
+      bool hotpOn = false;
+      bool ndefReadonly = false;
+      bool ndefEnabled = false;
+      bool webusbLandingEnabled = false;
+      bool sigTouch = false;
+      bool decTouch = false;
+      bool autTouch = false;
+      int cacheTime = 0;
       resp = await FlutterNfcKit.transceive('0042000000');
       Commons.assertOK(resp);
       switch (CanoKey.functionSetFromFirmwareVersion(firmwareVersion)) {
@@ -442,11 +580,52 @@ class _SettingsState extends State<Settings> {
       setState(() {
         _key = CanoKey(model, sn, chipId, firmwareVersion, ledOn, hotpOn, ndefReadonly, ndefEnabled, webusbLandingEnabled, sigTouch, decTouch,
             autTouch, cacheTime);
-        print(_key);
       });
     });
   }
+
+  void _changeTouchCacheTime(int cacheTime, String pin) async {
+    Commons.process(context, () async {
+      Commons.assertOK(await FlutterNfcKit.transceive('00A4040005F000000000'));
+      if (!await _verifyPin(pin)) return;
+      Navigator.pop(context);
+      Commons.assertOK(await FlutterNfcKit.transceive('000903' + cacheTime.toRadixString(16).padLeft(2, '0')));
+      Flushbar(backgroundColor: Colors.green, message: S.of(context).openpgpUifCacheTimeChanged, duration: Duration(seconds: 3)).show(context);
+      _refresh(pin);
+    });
+  }
+
+  Future<bool> _verifyPin(String pin) async {
+    String resp = await FlutterNfcKit.transceive('00200000' + pin.length.toRadixString(16).padLeft(2, '0') + hex.encode(pin.codeUnits));
+    if (Commons.isOK(resp)) return true;
+    Commons.promptPinFailureResult(context, resp);
+    return false;
+  }
+
+  void _changeSwitch(Func function, bool newStatus, String pin) async {
+    Commons.process(context, () async {
+      Commons.assertOK(await FlutterNfcKit.transceive('00A4040005F000000000'));
+      if (!await _verifyPin(pin)) return;
+      Navigator.pop(context);
+      Commons.assertOK(await FlutterNfcKit.transceive(_changeSwitchAPDUs[function][newStatus]));
+      Flushbar(backgroundColor: Colors.green, message: S.of(context).successfullyChanged, duration: Duration(seconds: 3)).show(context);
+      _refresh(pin);
+    });
+  }
+
+  Map _changeSwitchAPDUs = {
+    Func.led: {true: '00400101', false: '00400100'},
+    Func.hotp: {true: '00400301', false: '00400300'},
+    Func.ndefEnabled: {true: '00400401', false: '00400400'},
+    Func.ndefReadonly: {true: '00080100', false: '00080000'},
+    Func.webusbLandingPage: {true: '00400501', false: '00400500'},
+    Func.sigTouch: {true: '00090001', false: '00090000'},
+    Func.decTouch: {true: '00090101', false: '00090100'},
+    Func.autTouch: {true: '00090201', false: '00090200'},
+  };
 }
+
+enum Func { led, hotp, ndefEnabled, ndefReadonly, webusbLandingPage, sigTouch, decTouch, autTouch, touchCacheTime }
 
 enum FunctionSet {
   v1, // led, hotp, ndef readonly, sig/dec/aut touch, touch cache time
@@ -471,8 +650,11 @@ class CanoKey {
   CanoKey(this.model, this.sn, this.chipId, this.firmwareVersion, this.ledOn, this.hotpOn, this.ndefReadonly, this.ndefEnabled,
       this.webusbLandingEnabled, this.sigTouch, this.decTouch, this.autTouch, this.touchCacheTime);
 
-  FunctionSet functionSet() {
-    return functionSetFromFirmwareVersion(firmwareVersion);
+  Set<Func> functionSet() {
+    if (firmwareVersion.compareTo('1.5.') < 0) {
+      return {Func.led, Func.hotp, Func.ndefReadonly, Func.sigTouch, Func.decTouch, Func.autTouch, Func.touchCacheTime};
+    }
+    return {Func.led, Func.hotp, Func.webusbLandingPage, Func.ndefEnabled, Func.ndefReadonly};
   }
 
   static FunctionSet functionSetFromFirmwareVersion(String firmwareVersion) {

@@ -86,6 +86,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "settingsOtherSettings" : MessageLookupByLibrary.simpleMessage("Other Settings"),
     "settingsReset" : MessageLookupByLibrary.simpleMessage("Reset"),
     "settingsSN" : MessageLookupByLibrary.simpleMessage("Serial Number"),
-    "settingsWebUSB" : MessageLookupByLibrary.simpleMessage("WebUSB prompt when plug-in")
+    "settingsWebUSB" : MessageLookupByLibrary.simpleMessage("WebUSB prompt when plug-in"),
+    "successfullyChanged" : MessageLookupByLibrary.simpleMessage("Successfully changed")
   };
 }

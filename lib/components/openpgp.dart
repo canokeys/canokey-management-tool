@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:another_flushbar/flushbar.dart';
 import 'package:basic_utils/basic_utils.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
@@ -18,10 +19,10 @@ class OpenPGP extends StatefulWidget {
   static const String routeName = '/openpgp';
 
   @override
-  _OpenPGPState createState() => _OpenPGPState();
+  OpenPGPState createState() => OpenPGPState();
 }
 
-class _OpenPGPState extends State<OpenPGP> {
+class OpenPGPState extends State<OpenPGP> {
   OpenPGPCard _card;
 
   @override
@@ -71,7 +72,8 @@ class _OpenPGPState extends State<OpenPGP> {
                     _card.uifEnc == TouchPolicy.permanent ? null : () => _showChangeUifDialog(KeyType.encryption, _card.uifEnc)),
                 _itemTile(width, Icons.touch_app, S.of(context).openpgpAuthentication, _card.uifAut.toText(context),
                     _card.uifAut == TouchPolicy.permanent ? null : () => _showChangeUifDialog(KeyType.authentication, _card.uifAut)),
-                _itemTile(width, Icons.timelapse, S.of(context).openpgpUifCacheTime, '${_card.uifCacheTime}s', () => _showChangeCacheTimeDialog()),
+                _itemTile(width, Icons.timelapse, S.of(context).openpgpUifCacheTime, '${_card.uifCacheTime}s',
+                    () => showChangeCacheTimeDialog(context, 'Admin PIN', (time, pin) => _changeUifCacheTime(time, pin))),
                 SizedBox(height: 25.0),
               ],
               Text(S.of(context).actions, style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold)),
@@ -288,7 +290,7 @@ class _OpenPGPState extends State<OpenPGP> {
     );
   }
 
-  void _showChangeCacheTimeDialog() {
+  static void showChangeCacheTimeDialog(BuildContext context, String pinPrompt, Function callback) {
     final cacheTimeController = TextEditingController();
     final adminPinController = TextEditingController();
     bool tap = true;
@@ -331,8 +333,8 @@ class _OpenPGPState extends State<OpenPGP> {
                     controller: adminPinController,
                     obscureText: tap,
                     decoration: InputDecoration(
-                      labelText: 'Admin PIN',
-                      hintText: 'Admin PIN',
+                      labelText: pinPrompt,
+                      hintText: pinPrompt,
                       border: InputBorder.none,
                       prefixIcon: Icon(Icons.lock_outlined, color: Colors.indigo[500]),
                       suffixIcon: IconButton(
@@ -353,7 +355,7 @@ class _OpenPGPState extends State<OpenPGP> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       InkWell(
-                        onTap: () => _changeUifCacheTime(int.parse(cacheTimeController.text), adminPinController.text),
+                        onTap: () => callback(int.parse(cacheTimeController.text), adminPinController.text),
                         borderRadius: BorderRadius.circular(30.0),
                         child: Material(
                           elevation: 1.0,
@@ -588,9 +590,7 @@ class _OpenPGPState extends State<OpenPGP> {
           hex.encode(newPin.codeUnits));
       if (resp == '9000') {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(backgroundColor: Colors.green, behavior: SnackBarBehavior.floating, content: Text(S.of(context).openpgpPinChanged)),
-        );
+        Flushbar(backgroundColor: Colors.green, message: S.of(context).openpgpPinChanged, duration: Duration(seconds: 3)).show(context);
       } else {
         Commons.promptPinFailureResult(context, resp);
       }
@@ -604,8 +604,7 @@ class _OpenPGPState extends State<OpenPGP> {
       Commons.assertOK(
           await FlutterNfcKit.transceive('00DA00' + _getKeyUifTag(keyType) + '02' + newPolicy.toValue().toRadixString(16).padLeft(2, '0') + '20'));
       Navigator.pop(context);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(backgroundColor: Colors.green, behavior: SnackBarBehavior.floating, content: Text(S.of(context).openpgpUifChanged)));
+      Flushbar(backgroundColor: Colors.green, message: S.of(context).openpgpUifChanged, duration: Duration(seconds: 3)).show(context);
       _refresh();
     });
   }
@@ -616,8 +615,7 @@ class _OpenPGPState extends State<OpenPGP> {
       if (!await _verifyAdminPin(adminPin)) return;
       Commons.assertOK(await FlutterNfcKit.transceive('00DA010201' + cacheTime.toRadixString(16).padLeft(2, '0')));
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(backgroundColor: Colors.green, behavior: SnackBarBehavior.floating, content: Text(S.of(context).openpgpUifCacheTimeChanged)));
+      Flushbar(backgroundColor: Colors.green, message: S.of(context).openpgpUifCacheTimeChanged, duration: Duration(seconds: 3)).show(context);
       _refresh();
     });
   }

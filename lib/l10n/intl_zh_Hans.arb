@@ -20,6 +20,7 @@
   "confirm": "确定",
   "on": "开",
   "off": "关",
+  "successfullyChanged": "修改成功",
 
   "openpgpCardInfo": "卡片信息",
   "openpgpVersion": "版本",

@@ -86,6 +86,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "settingsOtherSettings" : MessageLookupByLibrary.simpleMessage("其他设置"),
     "settingsReset" : MessageLookupByLibrary.simpleMessage("重置"),
     "settingsSN" : MessageLookupByLibrary.simpleMessage("序号"),
-    "settingsWebUSB" : MessageLookupByLibrary.simpleMessage("插入时 WebUSB 提示")
+    "settingsWebUSB" : MessageLookupByLibrary.simpleMessage("插入时 WebUSB 提示"),
+    "successfullyChanged" : MessageLookupByLibrary.simpleMessage("修改成功")
   };
 }

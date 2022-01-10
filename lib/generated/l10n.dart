@@ -245,6 +245,16 @@ class S {
     );
   }
 
+  /// `Successfully changed`
+  String get successfullyChanged {
+    return Intl.message(
+      'Successfully changed',
+      name: 'successfullyChanged',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Card Info`
   String get openpgpCardInfo {
     return Intl.message(

@@ -38,6 +38,7 @@ dependencies:
   logging: ^1.0.2
   shared_preferences: ^2.0.11
   flutter_web_frame: ^0.0.2
+  another_flushbar: ^1.10.28
   flutter_nfc_kit:
     git:
       url: https://github.com/nfcim/flutter_nfc_kit.git

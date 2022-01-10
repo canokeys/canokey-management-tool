@@ -20,6 +20,7 @@
   "confirm": "Confirm",
   "on": "On",
   "off": "Off",
+  "successfullyChanged": "Successfully changed",
 
   "openpgpCardInfo": "Card Info",
   "openpgpVersion": "Version",

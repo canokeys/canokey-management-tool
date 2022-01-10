@@ -1,3 +1,4 @@
+import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
@@ -25,17 +26,11 @@ class Commons {
       await f();
     } on PlatformException catch (e) {
       if (e.message == 'NotFoundError: No device selected.') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(backgroundColor: Colors.red, behavior: SnackBarBehavior.floating, content: Text(S.of(context).pollCanceled)),
-        );
+        Flushbar(backgroundColor: Colors.red, message: S.of(context).pollCanceled, duration: Duration(seconds: 3)).show(context);
       } else if (e.message == 'NetworkError: A transfer error has occurred.') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(backgroundColor: Colors.red, behavior: SnackBarBehavior.floating, content: Text(S.of(context).networkError)),
-        );
+        Flushbar(backgroundColor: Colors.red, message: S.of(context).networkError, duration: Duration(seconds: 3)).show(context);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(backgroundColor: Colors.red, behavior: SnackBarBehavior.floating, content: Text(e.message)),
-        );
+        Flushbar(backgroundColor: Colors.red, message: e.message, duration: Duration(seconds: 3)).show(context);
       }
     } finally {
       FlutterNfcKit.finish();
@@ -44,27 +39,16 @@ class Commons {
 
   static void promptPinFailureResult(BuildContext context, String resp) {
     if (resp == '6983') {
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(backgroundColor: Colors.red, behavior: SnackBarBehavior.floating, content: Text(S.of(context).appletLocked)),
-      );
+      Flushbar(backgroundColor: Colors.red, message: S.of(context).appletLocked, duration: Duration(seconds: 3)).show(context);
     } else if (resp == '6982') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(backgroundColor: Colors.red, behavior: SnackBarBehavior.floating, content: Text(S.of(context).pinIncorrect)),
-      );
+      Flushbar(backgroundColor: Colors.red, message: S.of(context).pinIncorrect, duration: Duration(seconds: 3)).show(context);
     } else if (resp.startsWith('63C')) {
       String retries = resp[resp.length - 1];
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(backgroundColor: Colors.red, behavior: SnackBarBehavior.floating, content: Text(S.of(context).pinRetries(retries))),
-      );
+      Flushbar(backgroundColor: Colors.red, message: S.of(context).pinRetries(retries), duration: Duration(seconds: 3)).show(context);
     } else if (resp == '6700') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(backgroundColor: Colors.red, behavior: SnackBarBehavior.floating, content: Text(S.of(context).pinLength)),
-      );
+      Flushbar(backgroundColor: Colors.red, message: S.of(context).pinLength, duration: Duration(seconds: 3)).show(context);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(backgroundColor: Colors.red, behavior: SnackBarBehavior.floating, content: Text('Unknown response')),
-      );
+      Flushbar(backgroundColor: Colors.red, message: 'Unknown response', duration: Duration(seconds: 3)).show(context);
     }
   }
 }
