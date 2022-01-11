@@ -42,7 +42,7 @@ class Commons {
       Flushbar(backgroundColor: Colors.red, message: S.of(context).appletLocked, duration: Duration(seconds: 3)).show(context);
     } else if (resp == '6982') {
       Flushbar(backgroundColor: Colors.red, message: S.of(context).pinIncorrect, duration: Duration(seconds: 3)).show(context);
-    } else if (resp.startsWith('63C')) {
+    } else if (resp.toUpperCase().startsWith('63C')) {
       String retries = resp[resp.length - 1];
       Flushbar(backgroundColor: Colors.red, message: S.of(context).pinRetries(retries), duration: Duration(seconds: 3)).show(context);
     } else if (resp == '6700') {

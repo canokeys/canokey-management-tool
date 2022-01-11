@@ -19,11 +19,13 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'en';
 
-  static m0(keyType) => "Change ${keyType} Key\'s Touch Policy";
+  static m0(min) => "New PIN should be at least ${min} characters long. The maximum length is 64.";
 
-  static m1(min) => "New PIN should be at least ${min} characters long. The maximum length is 64.";
+  static m1(keyType) => "Change ${keyType} Key\'s Touch Policy";
 
   static m2(retries) => "Incorrect PIN. ${retries} retries left.";
+
+  static m3(applet) => "This operation will RESET all data of ${applet}! Please input your PIN to confirm.";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -31,6 +33,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "appletLocked" : MessageLookupByLibrary.simpleMessage("This applet has been locked."),
     "cancel" : MessageLookupByLibrary.simpleMessage("Cancel"),
     "change" : MessageLookupByLibrary.simpleMessage("Change"),
+    "changePin" : MessageLookupByLibrary.simpleMessage("Change PIN"),
+    "changePinPrompt" : m0,
     "close" : MessageLookupByLibrary.simpleMessage("Close"),
     "confirm" : MessageLookupByLibrary.simpleMessage("Confirm"),
     "home" : MessageLookupByLibrary.simpleMessage("Home"),
@@ -44,16 +48,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "openpgpCardHolder" : MessageLookupByLibrary.simpleMessage("Card Holder"),
     "openpgpCardInfo" : MessageLookupByLibrary.simpleMessage("Card Info"),
     "openpgpChangeAdminPin" : MessageLookupByLibrary.simpleMessage("Change Admin PIN"),
-    "openpgpChangeInteraction" : m0,
-    "openpgpChangePin" : MessageLookupByLibrary.simpleMessage("Change PIN"),
-    "openpgpChangePinPrompt" : m1,
+    "openpgpChangeInteraction" : m1,
     "openpgpChangeTouchCacheTime" : MessageLookupByLibrary.simpleMessage("Change Touch Cache Time"),
     "openpgpEncryption" : MessageLookupByLibrary.simpleMessage("Encryption"),
     "openpgpKeyNone" : MessageLookupByLibrary.simpleMessage("[none]"),
     "openpgpKeys" : MessageLookupByLibrary.simpleMessage("Keys"),
     "openpgpManufacturer" : MessageLookupByLibrary.simpleMessage("Manufacturer"),
-    "openpgpPinChanged" : MessageLookupByLibrary.simpleMessage("PIN has been successfully changed."),
-    "openpgpPinInvalidLength" : MessageLookupByLibrary.simpleMessage("Invalid length"),
     "openpgpPubkeyUrl" : MessageLookupByLibrary.simpleMessage("Public Key URL"),
     "openpgpSN" : MessageLookupByLibrary.simpleMessage("Serial Number"),
     "openpgpSignature" : MessageLookupByLibrary.simpleMessage("Signature"),
@@ -65,7 +65,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "openpgpUifOn" : MessageLookupByLibrary.simpleMessage("On"),
     "openpgpUifPermanent" : MessageLookupByLibrary.simpleMessage("Permanent (Cannot turn off)"),
     "openpgpVersion" : MessageLookupByLibrary.simpleMessage("Version"),
+    "pinChanged" : MessageLookupByLibrary.simpleMessage("PIN has been successfully changed."),
     "pinIncorrect" : MessageLookupByLibrary.simpleMessage("Incorrect PIN."),
+    "pinInvalidLength" : MessageLookupByLibrary.simpleMessage("Invalid length"),
     "pinLength" : MessageLookupByLibrary.simpleMessage("The provided PIN is too short or too long."),
     "pinRetries" : m2,
     "pollCanceled" : MessageLookupByLibrary.simpleMessage("No CanoKey is selected."),
@@ -85,7 +87,17 @@ class MessageLookup extends MessageLookupByLibrary {
     "settingsNDEFReadonly" : MessageLookupByLibrary.simpleMessage("NFC Tag Readonly"),
     "settingsOtherSettings" : MessageLookupByLibrary.simpleMessage("Other Settings"),
     "settingsReset" : MessageLookupByLibrary.simpleMessage("Reset"),
+    "settingsResetAll" : MessageLookupByLibrary.simpleMessage("All data is about to be erased. When you confirm, the CanoKey will blink repeatedly. Touch while it is blinking until success."),
+    "settingsResetApplet" : m3,
+    "settingsResetConditionNotSatisfying" : MessageLookupByLibrary.simpleMessage("PIN has not been locked yet"),
+    "settingsResetNDEF" : MessageLookupByLibrary.simpleMessage("Reset NDEF"),
+    "settingsResetOATH" : MessageLookupByLibrary.simpleMessage("Reset TOTP/HOTP"),
+    "settingsResetOpenPGP" : MessageLookupByLibrary.simpleMessage("Reset OpenPGP"),
+    "settingsResetPIV" : MessageLookupByLibrary.simpleMessage("Reset PIV"),
+    "settingsResetPresenceTestFailed" : MessageLookupByLibrary.simpleMessage("You did not touch the pad in time"),
+    "settingsResetSuccess" : MessageLookupByLibrary.simpleMessage("Successfully reset"),
     "settingsSN" : MessageLookupByLibrary.simpleMessage("Serial Number"),
+    "settingsWarning" : MessageLookupByLibrary.simpleMessage("Warning"),
     "settingsWebUSB" : MessageLookupByLibrary.simpleMessage("WebUSB prompt when plug-in"),
     "successfullyChanged" : MessageLookupByLibrary.simpleMessage("Successfully changed")
   };

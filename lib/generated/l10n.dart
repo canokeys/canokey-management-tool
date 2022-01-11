@@ -255,6 +255,46 @@ class S {
     );
   }
 
+  /// `Change PIN`
+  String get changePin {
+    return Intl.message(
+      'Change PIN',
+      name: 'changePin',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `New PIN should be at least {min} characters long. The maximum length is 64.`
+  String changePinPrompt(Object min) {
+    return Intl.message(
+      'New PIN should be at least $min characters long. The maximum length is 64.',
+      name: 'changePinPrompt',
+      desc: '',
+      args: [min],
+    );
+  }
+
+  /// `PIN has been successfully changed.`
+  String get pinChanged {
+    return Intl.message(
+      'PIN has been successfully changed.',
+      name: 'pinChanged',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Invalid length`
+  String get pinInvalidLength {
+    return Intl.message(
+      'Invalid length',
+      name: 'pinInvalidLength',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Card Info`
   String get openpgpCardInfo {
     return Intl.message(
@@ -405,16 +445,6 @@ class S {
     );
   }
 
-  /// `Change PIN`
-  String get openpgpChangePin {
-    return Intl.message(
-      'Change PIN',
-      name: 'openpgpChangePin',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Change Admin PIN`
   String get openpgpChangeAdminPin {
     return Intl.message(
@@ -430,16 +460,6 @@ class S {
     return Intl.message(
       'Change Touch Cache Time',
       name: 'openpgpChangeTouchCacheTime',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `PIN has been successfully changed.`
-  String get openpgpPinChanged {
-    return Intl.message(
-      'PIN has been successfully changed.',
-      name: 'openpgpPinChanged',
       desc: '',
       args: [],
     );
@@ -480,26 +500,6 @@ class S {
     return Intl.message(
       '[none]',
       name: 'openpgpKeyNone',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `New PIN should be at least {min} characters long. The maximum length is 64.`
-  String openpgpChangePinPrompt(Object min) {
-    return Intl.message(
-      'New PIN should be at least $min characters long. The maximum length is 64.',
-      name: 'openpgpChangePinPrompt',
-      desc: '',
-      args: [min],
-    );
-  }
-
-  /// `Invalid length`
-  String get openpgpPinInvalidLength {
-    return Intl.message(
-      'Invalid length',
-      name: 'openpgpPinInvalidLength',
       desc: '',
       args: [],
     );
@@ -640,6 +640,106 @@ class S {
     return Intl.message(
       'NFC Tag Readonly',
       name: 'settingsNDEFReadonly',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reset OpenPGP`
+  String get settingsResetOpenPGP {
+    return Intl.message(
+      'Reset OpenPGP',
+      name: 'settingsResetOpenPGP',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reset PIV`
+  String get settingsResetPIV {
+    return Intl.message(
+      'Reset PIV',
+      name: 'settingsResetPIV',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reset TOTP/HOTP`
+  String get settingsResetOATH {
+    return Intl.message(
+      'Reset TOTP/HOTP',
+      name: 'settingsResetOATH',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reset NDEF`
+  String get settingsResetNDEF {
+    return Intl.message(
+      'Reset NDEF',
+      name: 'settingsResetNDEF',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Warning`
+  String get settingsWarning {
+    return Intl.message(
+      'Warning',
+      name: 'settingsWarning',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This operation will RESET all data of {applet}! Please input your PIN to confirm.`
+  String settingsResetApplet(Object applet) {
+    return Intl.message(
+      'This operation will RESET all data of $applet! Please input your PIN to confirm.',
+      name: 'settingsResetApplet',
+      desc: '',
+      args: [applet],
+    );
+  }
+
+  /// `All data is about to be erased. When you confirm, the CanoKey will blink repeatedly. Touch while it is blinking until success.`
+  String get settingsResetAll {
+    return Intl.message(
+      'All data is about to be erased. When you confirm, the CanoKey will blink repeatedly. Touch while it is blinking until success.',
+      name: 'settingsResetAll',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Successfully reset`
+  String get settingsResetSuccess {
+    return Intl.message(
+      'Successfully reset',
+      name: 'settingsResetSuccess',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `PIN has not been locked yet`
+  String get settingsResetConditionNotSatisfying {
+    return Intl.message(
+      'PIN has not been locked yet',
+      name: 'settingsResetConditionNotSatisfying',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You did not touch the pad in time`
+  String get settingsResetPresenceTestFailed {
+    return Intl.message(
+      'You did not touch the pad in time',
+      name: 'settingsResetPresenceTestFailed',
       desc: '',
       args: [],
     );

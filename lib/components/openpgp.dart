@@ -92,7 +92,7 @@ class OpenPGPState extends State<OpenPGP> {
                         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
                         decoration: BoxDecoration(borderRadius: BorderRadius.circular(30.0), color: Colors.indigo),
                         child:
-                            Text(S.of(context).openpgpChangePin, style: TextStyle(color: Colors.white, fontSize: 15.0, fontWeight: FontWeight.bold)),
+                            Text(S.of(context).changePin, style: TextStyle(color: Colors.white, fontSize: 15.0, fontWeight: FontWeight.bold)),
                       ),
                     ),
                   ),
@@ -424,7 +424,7 @@ class OpenPGPState extends State<OpenPGP> {
                 divider(),
                 Container(
                   padding: EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0),
-                  child: Expanded(child: Text(S.of(context).openpgpChangePinPrompt(newPinMinLength), style: TextStyle(height: 1.5, fontSize: 15.0))),
+                  child: Text(S.of(context).changePinPrompt(6), style: TextStyle(height: 1.5, fontSize: 15.0)),
                 ),
                 Container(
                   padding: EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0),
@@ -452,7 +452,7 @@ class OpenPGPState extends State<OpenPGP> {
                     obscureText: tapNewPin,
                     onChanged: (newPin) => setState(() {
                       if (newPin.length < newPinMinLength || newPin.length > 64) {
-                        errorText = S.of(context).openpgpPinInvalidLength;
+                        errorText = S.of(context).pinInvalidLength;
                       } else {
                         errorText = null;
                       }
@@ -590,7 +590,7 @@ class OpenPGPState extends State<OpenPGP> {
           hex.encode(newPin.codeUnits));
       if (resp == '9000') {
         Navigator.pop(context);
-        Flushbar(backgroundColor: Colors.green, message: S.of(context).openpgpPinChanged, duration: Duration(seconds: 3)).show(context);
+        Flushbar(backgroundColor: Colors.green, message: S.of(context).pinChanged, duration: Duration(seconds: 3)).show(context);
       } else {
         Commons.promptPinFailureResult(context, resp);
       }
