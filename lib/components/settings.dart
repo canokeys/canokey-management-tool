@@ -6,8 +6,8 @@ import 'package:logging/logging.dart';
 
 import '../drawer.dart';
 import '../generated/l10n.dart';
+import '../utils/NumericalRangeFormatter.dart';
 import '../utils/commons.dart';
-import 'openpgp.dart';
 
 final log = Logger('ManagementTool:Settings');
 
@@ -19,8 +19,11 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  CanoKey _key;
-  String _pin;
+  TextEditingController pinController = TextEditingController();
+  TextEditingController newPinController = TextEditingController();
+  TextEditingController cacheTimeController = TextEditingController();
+  CanoKey key;
+  String pin;
 
   @override
   Widget build(BuildContext context) {
@@ -32,14 +35,14 @@ class _SettingsState extends State<Settings> {
         titleSpacing: 0.0,
         centerTitle: true,
         title: Text(S.of(context).settings, style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.white)),
-        actions: [IconButton(icon: Icon(Icons.refresh), onPressed: _showInputPinDialog)],
+        actions: [IconButton(icon: Icon(Icons.refresh), onPressed: showInputPinDialog)],
       ),
       drawer: AppDrawer(),
       body: Container(
         padding: EdgeInsets.all(20.0),
         child: ListView(
           children: [
-            if (_key == null) ...[
+            if (key == null) ...[
               SizedBox(height: 30.0),
               Center(
                 child: Text(S.of(context).pollCanoKey, style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold)),
@@ -48,41 +51,40 @@ class _SettingsState extends State<Settings> {
             ] else ...[
               Text(S.of(context).settingsInfo, style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold)),
               SizedBox(height: 15.0),
-              _itemTile(width, Icons.mode, S.of(context).settingsModel, _key.model),
-              _itemTile(width, Icons.info, S.of(context).settingsFirmwareVersion, _key.firmwareVersion),
-              _itemTile(width, Icons.vpn_key, S.of(context).settingsSN, _key.sn),
-              _itemTile(width, Icons.memory, S.of(context).settingsChipId, _key.chipId),
+              itemTile(width, Icons.mode, S.of(context).settingsModel, key.model),
+              itemTile(width, Icons.info, S.of(context).settingsFirmwareVersion, key.firmwareVersion),
+              itemTile(width, Icons.vpn_key, S.of(context).settingsSN, key.sn),
+              itemTile(width, Icons.memory, S.of(context).settingsChipId, key.chipId),
               SizedBox(height: 25.0),
               Text(S.of(context).settings, style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold)),
               SizedBox(height: 15.0),
-              if (_key.functionSet().contains(Func.led))
-                _itemTile(width, Icons.light_mode, 'LED', _key.ledOn ? S.of(context).on : S.of(context).off,
-                    () => _showChangeSwitchDialog('LED', Func.led, _key.ledOn)),
-              if (_key.functionSet().contains(Func.hotp))
-                _itemTile(width, Icons.keyboard_alt_outlined, S.of(context).settingsHotp, _key.hotpOn ? S.of(context).on : S.of(context).off,
-                    () => _showChangeSwitchDialog(S.of(context).settingsHotp, Func.hotp, _key.hotpOn)),
-              if (_key.functionSet().contains(Func.webusbLandingPage))
-                _itemTile(width, Icons.web, S.of(context).settingsWebUSB, _key.webusbLandingEnabled ? S.of(context).on : S.of(context).off,
-                    () => _showChangeSwitchDialog(S.of(context).settingsWebUSB, Func.webusbLandingPage, _key.webusbLandingEnabled)),
-              if (_key.functionSet().contains(Func.ndefEnabled))
-                _itemTile(width, Icons.nfc, S.of(context).settingsNDEF, _key.ndefEnabled ? S.of(context).on : S.of(context).off,
-                    () => _showChangeSwitchDialog(S.of(context).settingsNDEF, Func.ndefEnabled, _key.ndefEnabled)),
-              if (_key.functionSet().contains(Func.ndefReadonly))
-                _itemTile(width, Icons.brush, S.of(context).settingsNDEFReadonly, _key.ndefReadonly ? S.of(context).on : S.of(context).off,
-                    () => _showChangeSwitchDialog(S.of(context).settingsNDEFReadonly, Func.ndefReadonly, _key.ndefReadonly)),
-              if (_key.functionSet().contains(Func.sigTouch)) ...[
+              if (key.functionSet().contains(Func.led))
+                itemTile(width, Icons.light_mode, 'LED', key.ledOn ? S.of(context).on : S.of(context).off,
+                    () => showChangeSwitchDialog('LED', Func.led, key.ledOn)),
+              if (key.functionSet().contains(Func.hotp))
+                itemTile(width, Icons.keyboard_alt_outlined, S.of(context).settingsHotp, key.hotpOn ? S.of(context).on : S.of(context).off,
+                    () => showChangeSwitchDialog(S.of(context).settingsHotp, Func.hotp, key.hotpOn)),
+              if (key.functionSet().contains(Func.webusbLandingPage))
+                itemTile(width, Icons.web, S.of(context).settingsWebUSB, key.webusbLandingEnabled ? S.of(context).on : S.of(context).off,
+                    () => showChangeSwitchDialog(S.of(context).settingsWebUSB, Func.webusbLandingPage, key.webusbLandingEnabled)),
+              if (key.functionSet().contains(Func.ndefEnabled))
+                itemTile(width, Icons.nfc, S.of(context).settingsNDEF, key.ndefEnabled ? S.of(context).on : S.of(context).off,
+                    () => showChangeSwitchDialog(S.of(context).settingsNDEF, Func.ndefEnabled, key.ndefEnabled)),
+              if (key.functionSet().contains(Func.ndefReadonly))
+                itemTile(width, Icons.brush, S.of(context).settingsNDEFReadonly, key.ndefReadonly ? S.of(context).on : S.of(context).off,
+                    () => showChangeSwitchDialog(S.of(context).settingsNDEFReadonly, Func.ndefReadonly, key.ndefReadonly)),
+              if (key.functionSet().contains(Func.sigTouch)) ...[
                 // OpenPGP options work together
                 SizedBox(height: 25.0),
                 Text('OpenPGP ' + S.of(context).openpgpUIF, style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold)),
                 SizedBox(height: 15.0),
-                _itemTile(width, Icons.brush, S.of(context).openpgpSignature, _key.sigTouch ? S.of(context).on : S.of(context).off,
-                    () => _showChangeSwitchDialog(S.of(context).openpgpSignature, Func.led, _key.ledOn)),
-                _itemTile(width, Icons.brush, S.of(context).openpgpEncryption, _key.decTouch ? S.of(context).on : S.of(context).off,
-                    () => _showChangeSwitchDialog(S.of(context).openpgpEncryption, Func.led, _key.ledOn)),
-                _itemTile(width, Icons.brush, S.of(context).openpgpAuthentication, _key.autTouch ? S.of(context).on : S.of(context).off,
-                    () => _showChangeSwitchDialog(S.of(context).openpgpAuthentication, Func.led, _key.ledOn)),
-                _itemTile(width, Icons.brush, S.of(context).openpgpUifCacheTime, _key.touchCacheTime.toString(),
-                    () => OpenPGPState.showChangeCacheTimeDialog(context, 'PIN', (time, pin) => _changeTouchCacheTime(time, pin))),
+                itemTile(width, Icons.brush, S.of(context).openpgpSignature, key.sigTouch ? S.of(context).on : S.of(context).off,
+                    () => showChangeSwitchDialog(S.of(context).openpgpSignature, Func.led, key.ledOn)),
+                itemTile(width, Icons.brush, S.of(context).openpgpEncryption, key.decTouch ? S.of(context).on : S.of(context).off,
+                    () => showChangeSwitchDialog(S.of(context).openpgpEncryption, Func.led, key.ledOn)),
+                itemTile(width, Icons.brush, S.of(context).openpgpAuthentication, key.autTouch ? S.of(context).on : S.of(context).off,
+                    () => showChangeSwitchDialog(S.of(context).openpgpAuthentication, Func.led, key.ledOn)),
+                itemTile(width, Icons.brush, S.of(context).openpgpUifCacheTime, key.touchCacheTime.toString(), showChangeCacheTimeDialog),
               ]
             ],
             Text(S.of(context).actions, style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold)),
@@ -91,9 +93,9 @@ class _SettingsState extends State<Settings> {
               spacing: 15.0,
               runSpacing: 15.0,
               children: [
-                if (_key != null) ...[
+                if (key != null) ...[
                   InkWell(
-                    onTap: _showChangePinDialog,
+                    onTap: showChangePinDialog,
                     borderRadius: BorderRadius.circular(30.0),
                     child: Material(
                       elevation: 1.0,
@@ -106,7 +108,7 @@ class _SettingsState extends State<Settings> {
                     ),
                   ),
                   InkWell(
-                    onTap: () => _showResetAppletDialog(Applet.OpenPGP),
+                    onTap: () => showResetAppletDialog(Applet.OpenPGP),
                     borderRadius: BorderRadius.circular(30.0),
                     child: Material(
                       elevation: 1.0,
@@ -120,7 +122,7 @@ class _SettingsState extends State<Settings> {
                     ),
                   ),
                   InkWell(
-                    onTap: () => _showResetAppletDialog(Applet.PIV),
+                    onTap: () => showResetAppletDialog(Applet.PIV),
                     borderRadius: BorderRadius.circular(30.0),
                     child: Material(
                       elevation: 1.0,
@@ -134,7 +136,7 @@ class _SettingsState extends State<Settings> {
                     ),
                   ),
                   InkWell(
-                    onTap: () => _showResetAppletDialog(Applet.OATH),
+                    onTap: () => showResetAppletDialog(Applet.OATH),
                     borderRadius: BorderRadius.circular(30.0),
                     child: Material(
                       elevation: 1.0,
@@ -148,7 +150,7 @@ class _SettingsState extends State<Settings> {
                     ),
                   ),
                   InkWell(
-                    onTap: () => _showResetAppletDialog(Applet.NDEF),
+                    onTap: () => showResetAppletDialog(Applet.NDEF),
                     borderRadius: BorderRadius.circular(30.0),
                     child: Material(
                       elevation: 1.0,
@@ -163,7 +165,7 @@ class _SettingsState extends State<Settings> {
                   ),
                 ],
                 InkWell(
-                  onTap: _showResetDialog,
+                  onTap: showResetDialog,
                   borderRadius: BorderRadius.circular(30.0),
                   child: Material(
                     elevation: 1.0,
@@ -179,14 +181,22 @@ class _SettingsState extends State<Settings> {
             ),
             SizedBox(height: 25.0),
             Text(S.of(context).settingsOtherSettings, style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold)),
-            _itemTile(width, Icons.language, S.of(context).settingsLanguage, '简体中文', () => _showChangeLanguageDialog('简体中文')),
+            itemTile(width, Icons.language, S.of(context).settingsLanguage, '简体中文', () => showChangeLanguageDialog('简体中文')),
           ],
         ),
       ),
     );
   }
 
-  Widget _itemTile(double width, IconData icon, String title, String subtitle, [Function handler]) {
+  @override
+  void dispose() {
+    pinController.dispose();
+    newPinController.dispose();
+    cacheTimeController.dispose();
+    super.dispose();
+  }
+
+  Widget itemTile(double width, IconData icon, String title, String subtitle, [Function handler]) {
     return Container(
       padding: EdgeInsets.all(10.0),
       child: Column(
@@ -236,7 +246,7 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  void _showChangeSwitchDialog(String title, Func function, bool currentStatus) {
+  void showChangeSwitchDialog(String title, Func function, bool currentStatus) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -290,7 +300,7 @@ class _SettingsState extends State<Settings> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       InkWell(
-                        onTap: () => _changeSwitch(function, currentStatus, _pin),
+                        onTap: () => changeSwitch(function, currentStatus, pin),
                         borderRadius: BorderRadius.circular(30.0),
                         child: Material(
                           elevation: 1.0,
@@ -327,8 +337,7 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  void _showInputPinDialog() {
-    final pinController = TextEditingController();
+  void showInputPinDialog() {
     bool tapPin = true;
 
     showDialog(
@@ -347,7 +356,7 @@ class _SettingsState extends State<Settings> {
                     child: Text(S.of(context).settingsInputPin, style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 ),
-                SizedBox(height: 10.0),
+                Divider(color: Colors.black),
                 Container(
                   padding: EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0),
                   child: Text(S.of(context).settingsInputPinPrompt, style: TextStyle(height: 1.5, fontSize: 15.0)),
@@ -357,6 +366,12 @@ class _SettingsState extends State<Settings> {
                   child: TextField(
                     controller: pinController,
                     obscureText: tapPin,
+                    autofocus: true,
+                    onSubmitted: (String pin) {
+                      if (pin.isEmpty) return;
+                      refresh(pin);
+                      Navigator.pop(context);
+                    },
                     decoration: InputDecoration(
                       labelText: 'PIN',
                       hintText: 'PIN',
@@ -371,7 +386,7 @@ class _SettingsState extends State<Settings> {
                     ),
                   ),
                 ),
-                SizedBox(height: 10.0),
+                Divider(color: Colors.black),
                 Container(
                   padding: EdgeInsets.all(20.0),
                   margin: EdgeInsets.only(left: 30.0),
@@ -381,8 +396,8 @@ class _SettingsState extends State<Settings> {
                     children: [
                       InkWell(
                         onTap: () {
+                          refresh(pinController.text);
                           Navigator.pop(context);
-                          _refresh(pinController.text);
                         },
                         borderRadius: BorderRadius.circular(30.0),
                         child: Material(
@@ -420,7 +435,7 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  void _showResetDialog() {
+  void showResetDialog() {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -453,7 +468,7 @@ class _SettingsState extends State<Settings> {
                           ),
                         ),
                         InkWell(
-                          onTap: _reset,
+                          onTap: reset,
                           child: Container(
                             alignment: Alignment.center,
                             padding: EdgeInsets.all(10.0),
@@ -473,8 +488,7 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  void _showResetAppletDialog(Applet applet) {
-    final pinController = TextEditingController();
+  void showResetAppletDialog(Applet applet) {
     bool tapPin = true;
 
     showDialog(
@@ -503,6 +517,12 @@ class _SettingsState extends State<Settings> {
                         child: TextField(
                           controller: pinController,
                           obscureText: tapPin,
+                          autofocus: true,
+                          onSubmitted: (String pin) {
+                            if (pin.isEmpty) return;
+                            resetApplet(applet, pin);
+                            Navigator.pop(context);
+                          },
                           decoration: InputDecoration(
                             labelText: 'PIN',
                             hintText: 'PIN',
@@ -530,7 +550,7 @@ class _SettingsState extends State<Settings> {
                             ),
                           ),
                           InkWell(
-                            onTap: () => _resetApplet(applet, pinController.text),
+                            onTap: () => resetApplet(applet, pinController.text),
                             child: Container(
                               alignment: Alignment.center,
                               padding: EdgeInsets.all(10.0),
@@ -551,10 +571,8 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  void _showChangePinDialog() {
-    final oldPinController = TextEditingController();
-    final newPinController = TextEditingController();
-    bool tapOldPin = true;
+  void showChangePinDialog() {
+    bool tapPin = true;
     bool tapNewPin = true;
     String errorText;
 
@@ -583,16 +601,17 @@ class _SettingsState extends State<Settings> {
                 Container(
                   padding: EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0),
                   child: TextField(
-                    controller: oldPinController,
-                    obscureText: tapOldPin,
+                    controller: pinController,
+                    obscureText: tapPin,
+                    autofocus: true,
                     decoration: InputDecoration(
                       labelText: S.of(context).oldPin,
                       hintText: S.of(context).oldPin,
                       border: InputBorder.none,
                       prefixIcon: Icon(Icons.lock_outlined, color: Colors.indigo[500]),
                       suffixIcon: IconButton(
-                        onPressed: () => setState(() => tapOldPin = !tapOldPin),
-                        icon: tapOldPin
+                        onPressed: () => setState(() => tapPin = !tapPin),
+                        icon: tapPin
                             ? Icon(Icons.remove_red_eye_outlined, color: Colors.indigo[500])
                             : Icon(Icons.visibility_off_outlined, color: Colors.indigo[500]),
                       ),
@@ -635,7 +654,7 @@ class _SettingsState extends State<Settings> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       InkWell(
-                        onTap: () => _changePin(oldPinController.text, newPinController.text),
+                        onTap: () => changePin(pinController.text, newPinController.text),
                         borderRadius: BorderRadius.circular(30.0),
                         child: Material(
                           elevation: 1.0,
@@ -672,7 +691,107 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  void _showChangeLanguageDialog(String currentLanguage) {
+  void showChangeCacheTimeDialog() {
+    bool tap = true;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) {
+        return StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
+          divider() {
+            return Container(width: double.infinity, height: 1.0, color: Colors.grey);
+          }
+
+          return Dialog(
+            elevation: 0.0,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+            child: Wrap(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(20.0),
+                  child: Center(child: Text(S.of(context).openpgpChangeTouchCacheTime, style: TextStyle(fontWeight: FontWeight.bold))),
+                ),
+                divider(),
+                Container(
+                  padding: EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0),
+                  child: TextField(
+                    controller: cacheTimeController,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [new NumericalRangeFormatter(min: 0, max: 255)],
+                    decoration: InputDecoration(
+                        labelText: S.of(context).openpgpUifCacheTime + ' (0 ~ 255)',
+                        hintText: S.of(context).openpgpUifCacheTime + ' (0 ~ 255 ${S.of(context).seconds})',
+                        border: InputBorder.none,
+                        prefixIcon: Icon(Icons.timelapse, color: Colors.indigo[500])),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.only(bottom: 20.0, left: 20.0, right: 20.0),
+                  child: TextField(
+                    controller: pinController,
+                    obscureText: tap,
+                    decoration: InputDecoration(
+                      labelText: 'PIN',
+                      hintText: 'PIN',
+                      border: InputBorder.none,
+                      prefixIcon: Icon(Icons.lock_outlined, color: Colors.indigo[500]),
+                      suffixIcon: IconButton(
+                        onPressed: () => setState(() => tap = !tap),
+                        icon: tap
+                            ? Icon(Icons.remove_red_eye_outlined, color: Colors.indigo[500])
+                            : Icon(Icons.visibility_off_outlined, color: Colors.indigo[500]),
+                      ),
+                    ),
+                  ),
+                ),
+                divider(),
+                Container(
+                  padding: EdgeInsets.all(20.0),
+                  margin: EdgeInsets.only(left: 30.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      InkWell(
+                        onTap: () => changeTouchCacheTime(int.parse(cacheTimeController.text), pin),
+                        borderRadius: BorderRadius.circular(30.0),
+                        child: Material(
+                          elevation: 1.0,
+                          borderRadius: BorderRadius.circular(30.0),
+                          child: Container(
+                            padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(30.0), color: Colors.indigo),
+                            child: Text(S.of(context).save, style: TextStyle(color: Colors.white, fontSize: 15.0, fontWeight: FontWeight.bold)),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 15.0),
+                      InkWell(
+                        onTap: () => Navigator.pop(context),
+                        borderRadius: BorderRadius.circular(30.0),
+                        child: Material(
+                          elevation: 1.0,
+                          borderRadius: BorderRadius.circular(30.0),
+                          child: Container(
+                            padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(30.0), color: Colors.indigo[100]),
+                            child: Text(S.of(context).close, style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold)),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+      },
+    );
+  }
+
+  void showChangeLanguageDialog(String currentLanguage) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -763,7 +882,7 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  void _refresh(String pin) async {
+  void refresh(String pin) async {
     Commons.process(context, () async {
       Commons.assertOK(await FlutterNfcKit.transceive('00A4040005F000000000'));
       String resp = await FlutterNfcKit.transceive('0031000000');
@@ -780,11 +899,11 @@ class _SettingsState extends State<Settings> {
       String chipId = Commons.dropSW(resp).toUpperCase();
       resp = await FlutterNfcKit.transceive('00200000' + pin.length.toRadixString(16).padLeft(2, '0') + hex.encode(pin.codeUnits));
       if (!Commons.isOK(resp)) {
-        _pin = null;
+        this.pin = null;
         Commons.promptPinFailureResult(context, resp);
         return;
       }
-      _pin = pin;
+      this.pin = pin;
       // read configurations
       bool ledOn = false;
       bool hotpOn = false;
@@ -816,64 +935,64 @@ class _SettingsState extends State<Settings> {
           break;
       }
       setState(() {
-        _key = CanoKey(model, sn, chipId, firmwareVersion, ledOn, hotpOn, ndefReadonly, ndefEnabled, webusbLandingEnabled, sigTouch, decTouch,
+        key = CanoKey(model, sn, chipId, firmwareVersion, ledOn, hotpOn, ndefReadonly, ndefEnabled, webusbLandingEnabled, sigTouch, decTouch,
             autTouch, cacheTime);
       });
     });
   }
 
-  void _changePin(String oldPin, String newPin) async {
+  void changePin(String oldPin, String newPin) async {
     Commons.process(context, () async {
       Commons.assertOK(await FlutterNfcKit.transceive('00A4040005F000000000'));
-      if (!await _verifyPin(oldPin)) return;
+      if (!await verifyPin(oldPin)) return;
       Navigator.pop(context);
       Commons.assertOK(await FlutterNfcKit.transceive('00210000' + newPin.length.toRadixString(16).padLeft(2, '0') + hex.encode(newPin.codeUnits)));
       Flushbar(backgroundColor: Colors.green, message: S.of(context).pinChanged, duration: Duration(seconds: 3)).show(context);
-      _pin = null;
+      pin = null;
     });
   }
 
-  void _changeTouchCacheTime(int cacheTime, String pin) async {
+  void changeTouchCacheTime(int cacheTime, String pin) async {
     Commons.process(context, () async {
       Commons.assertOK(await FlutterNfcKit.transceive('00A4040005F000000000'));
-      if (!await _verifyPin(pin)) return;
+      if (!await verifyPin(pin)) return;
       Navigator.pop(context);
       Commons.assertOK(await FlutterNfcKit.transceive('000903' + cacheTime.toRadixString(16).padLeft(2, '0')));
       Flushbar(backgroundColor: Colors.green, message: S.of(context).openpgpUifCacheTimeChanged, duration: Duration(seconds: 3)).show(context);
-      _refresh(pin);
+      refresh(pin);
     });
   }
 
-  Future<bool> _verifyPin(String pin) async {
+  Future<bool> verifyPin(String pin) async {
     String resp = await FlutterNfcKit.transceive('00200000' + pin.length.toRadixString(16).padLeft(2, '0') + hex.encode(pin.codeUnits));
     if (Commons.isOK(resp)) return true;
     Commons.promptPinFailureResult(context, resp);
     return false;
   }
 
-  void _changeSwitch(Func function, bool newStatus, String pin) async {
+  void changeSwitch(Func function, bool newStatus, String pin) async {
     Commons.process(context, () async {
       Commons.assertOK(await FlutterNfcKit.transceive('00A4040005F000000000'));
-      if (!await _verifyPin(pin)) return;
+      if (!await verifyPin(pin)) return;
       Navigator.pop(context);
-      Commons.assertOK(await FlutterNfcKit.transceive(_changeSwitchAPDUs[function][newStatus]));
+      Commons.assertOK(await FlutterNfcKit.transceive(changeSwitchAPDUs[function][newStatus]));
       Flushbar(backgroundColor: Colors.green, message: S.of(context).successfullyChanged, duration: Duration(seconds: 3)).show(context);
-      _refresh(pin);
+      refresh(pin);
     });
   }
 
-  void _resetApplet(Applet applet, String pin) async {
+  void resetApplet(Applet applet, String pin) async {
     Commons.process(context, () async {
       Commons.assertOK(await FlutterNfcKit.transceive('00A4040005F000000000'));
-      if (!await _verifyPin(pin)) return;
+      if (!await verifyPin(pin)) return;
       Navigator.pop(context);
-      Commons.assertOK(await FlutterNfcKit.transceive(_resetAppletAPDUs[applet]));
+      Commons.assertOK(await FlutterNfcKit.transceive(resetAppletAPDUs[applet]));
       Flushbar(backgroundColor: Colors.green, message: S.of(context).settingsResetSuccess, duration: Duration(seconds: 3)).show(context);
-      _refresh(pin);
+      refresh(pin);
     });
   }
 
-  void _reset() async {
+  void reset() async {
     Commons.process(context, () async {
       Commons.assertOK(await FlutterNfcKit.transceive('00A4040005F000000000'));
       // TODO: add loading animation
@@ -882,7 +1001,8 @@ class _SettingsState extends State<Settings> {
         Navigator.pop(context);
         Flushbar(backgroundColor: Colors.green, message: S.of(context).settingsResetSuccess, duration: Duration(seconds: 3)).show(context);
       } else if (resp == '6985') {
-        Flushbar(backgroundColor: Colors.red, message: S.of(context).settingsResetConditionNotSatisfying, duration: Duration(seconds: 3)).show(context);
+        Flushbar(backgroundColor: Colors.red, message: S.of(context).settingsResetConditionNotSatisfying, duration: Duration(seconds: 3))
+            .show(context);
       } else if (resp == '6982') {
         Flushbar(backgroundColor: Colors.red, message: S.of(context).settingsResetPresenceTestFailed, duration: Duration(seconds: 3)).show(context);
       } else {
@@ -891,7 +1011,7 @@ class _SettingsState extends State<Settings> {
     });
   }
 
-  Map _changeSwitchAPDUs = {
+  Map changeSwitchAPDUs = {
     Func.led: {true: '00400101', false: '00400100'},
     Func.hotp: {true: '00400301', false: '00400300'},
     Func.ndefEnabled: {true: '00400401', false: '00400400'},
@@ -902,7 +1022,7 @@ class _SettingsState extends State<Settings> {
     Func.autTouch: {true: '00090201', false: '00090200'},
   };
 
-  Map _resetAppletAPDUs = {
+  Map resetAppletAPDUs = {
     Applet.OpenPGP: '00030000',
     Applet.PIV: '00040000',
     Applet.OATH: '00050000',

@@ -23,7 +23,10 @@ class OpenPGP extends StatefulWidget {
 }
 
 class OpenPGPState extends State<OpenPGP> {
-  OpenPGPCard _card;
+  TextEditingController cacheTimeController = TextEditingController();
+  TextEditingController pinController = TextEditingController();
+  TextEditingController newPinController = TextEditingController();
+  OpenPGPCard card;
 
   @override
   Widget build(BuildContext context) {
@@ -35,14 +38,14 @@ class OpenPGPState extends State<OpenPGP> {
         titleSpacing: 0.0,
         centerTitle: true,
         title: Text('OpenPGP', style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.white)),
-        actions: [IconButton(icon: Icon(Icons.refresh), onPressed: _refresh)],
+        actions: [IconButton(icon: Icon(Icons.refresh), onPressed: refresh)],
       ),
       drawer: AppDrawer(),
       body: Container(
         padding: EdgeInsets.all(20.0),
         child: ListView(
           children: [
-            if (_card == null) ...[
+            if (card == null) ...[
               SizedBox(height: 25.0),
               Center(
                 child: Text(S.of(context).pollCanoKey, style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold)),
@@ -51,29 +54,28 @@ class OpenPGPState extends State<OpenPGP> {
             ] else ...[
               Text(S.of(context).openpgpCardInfo, style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold)),
               SizedBox(height: 15.0),
-              _itemTile(width, Icons.add, S.of(context).openpgpVersion, _card.version),
-              _itemTile(width, Icons.shopping_bag, S.of(context).openpgpManufacturer, _card.manufacturer),
-              _itemTile(width, Icons.vpn_key, S.of(context).openpgpSN, _card.sn),
-              _itemTile(width, Icons.person, S.of(context).openpgpCardHolder, _card.cardHolder),
-              _itemTile(width, Icons.star, S.of(context).openpgpPubkeyUrl, _card.publicKeyUrl),
+              itemTile(width, Icons.add, S.of(context).openpgpVersion, card.version),
+              itemTile(width, Icons.shopping_bag, S.of(context).openpgpManufacturer, card.manufacturer),
+              itemTile(width, Icons.vpn_key, S.of(context).openpgpSN, card.sn),
+              itemTile(width, Icons.person, S.of(context).openpgpCardHolder, card.cardHolder),
+              itemTile(width, Icons.star, S.of(context).openpgpPubkeyUrl, card.publicKeyUrl),
               SizedBox(height: 25.0),
               Text(S.of(context).openpgpKeys, style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold)),
               SizedBox(height: 15.0),
-              _itemTile(width, Icons.lock_outline, S.of(context).openpgpSignature, _card.signature),
-              _itemTile(width, Icons.lock_outline, S.of(context).openpgpEncryption, _card.encryption),
-              _itemTile(width, Icons.lock_outline, S.of(context).openpgpAuthentication, _card.authentication),
+              itemTile(width, Icons.lock_outline, S.of(context).openpgpSignature, card.signature),
+              itemTile(width, Icons.lock_outline, S.of(context).openpgpEncryption, card.encryption),
+              itemTile(width, Icons.lock_outline, S.of(context).openpgpAuthentication, card.authentication),
               SizedBox(height: 25.0),
-              if (_card.uifSig != TouchPolicy.na) ...[
+              if (card.uifSig != TouchPolicy.na) ...[
                 Text(S.of(context).openpgpUIF, style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold)),
                 SizedBox(height: 15.0),
-                _itemTile(width, Icons.touch_app, S.of(context).openpgpSignature, _card.uifSig.toText(context),
-                    _card.uifSig == TouchPolicy.permanent ? null : () => _showChangeUifDialog(KeyType.signature, _card.uifSig)),
-                _itemTile(width, Icons.touch_app, S.of(context).openpgpEncryption, _card.uifEnc.toText(context),
-                    _card.uifEnc == TouchPolicy.permanent ? null : () => _showChangeUifDialog(KeyType.encryption, _card.uifEnc)),
-                _itemTile(width, Icons.touch_app, S.of(context).openpgpAuthentication, _card.uifAut.toText(context),
-                    _card.uifAut == TouchPolicy.permanent ? null : () => _showChangeUifDialog(KeyType.authentication, _card.uifAut)),
-                _itemTile(width, Icons.timelapse, S.of(context).openpgpUifCacheTime, '${_card.uifCacheTime}s',
-                    () => showChangeCacheTimeDialog(context, 'Admin PIN', (time, pin) => _changeUifCacheTime(time, pin))),
+                itemTile(width, Icons.touch_app, S.of(context).openpgpSignature, card.uifSig.toText(context),
+                    card.uifSig == TouchPolicy.permanent ? null : () => showChangeUifDialog(KeyType.signature, card.uifSig)),
+                itemTile(width, Icons.touch_app, S.of(context).openpgpEncryption, card.uifEnc.toText(context),
+                    card.uifEnc == TouchPolicy.permanent ? null : () => showChangeUifDialog(KeyType.encryption, card.uifEnc)),
+                itemTile(width, Icons.touch_app, S.of(context).openpgpAuthentication, card.uifAut.toText(context),
+                    card.uifAut == TouchPolicy.permanent ? null : () => showChangeUifDialog(KeyType.authentication, card.uifAut)),
+                itemTile(width, Icons.timelapse, S.of(context).openpgpUifCacheTime, '${card.uifCacheTime}s', showChangeCacheTimeDialog),
                 SizedBox(height: 25.0),
               ],
               Text(S.of(context).actions, style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold)),
@@ -83,7 +85,7 @@ class OpenPGPState extends State<OpenPGP> {
                 runSpacing: 15.0,
                 children: [
                   InkWell(
-                    onTap: () => _showChangePinDialog(PinType.pin),
+                    onTap: () => showChangePinDialog(PinType.pin),
                     borderRadius: BorderRadius.circular(30.0),
                     child: Material(
                       elevation: 1.0,
@@ -91,13 +93,12 @@ class OpenPGPState extends State<OpenPGP> {
                       child: Container(
                         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
                         decoration: BoxDecoration(borderRadius: BorderRadius.circular(30.0), color: Colors.indigo),
-                        child:
-                            Text(S.of(context).changePin, style: TextStyle(color: Colors.white, fontSize: 15.0, fontWeight: FontWeight.bold)),
+                        child: Text(S.of(context).changePin, style: TextStyle(color: Colors.white, fontSize: 15.0, fontWeight: FontWeight.bold)),
                       ),
                     ),
                   ),
                   InkWell(
-                    onTap: () => _showChangePinDialog(PinType.adminPin),
+                    onTap: () => showChangePinDialog(PinType.adminPin),
                     borderRadius: BorderRadius.circular(30.0),
                     child: Material(
                       elevation: 1.0,
@@ -119,7 +120,15 @@ class OpenPGPState extends State<OpenPGP> {
     );
   }
 
-  Widget _itemTile(double width, IconData icon, String title, String subtitle, [Function handler]) {
+  @override
+  void dispose() {
+    cacheTimeController.dispose();
+    pinController.dispose();
+    newPinController.dispose();
+    super.dispose();
+  }
+
+  Widget itemTile(double width, IconData icon, String title, String subtitle, [Function handler]) {
     return Container(
       padding: EdgeInsets.all(10.0),
       child: Column(
@@ -169,8 +178,7 @@ class OpenPGPState extends State<OpenPGP> {
     );
   }
 
-  void _showChangeUifDialog(KeyType keyType, TouchPolicy currentPolicy) {
-    final adminPinController = TextEditingController();
+  void showChangeUifDialog(KeyType keyType, TouchPolicy currentPolicy) {
     bool tap = true;
 
     showDialog(
@@ -228,7 +236,7 @@ class OpenPGPState extends State<OpenPGP> {
                 Container(
                   padding: EdgeInsets.all(20.0),
                   child: TextField(
-                    controller: adminPinController,
+                    controller: pinController,
                     obscureText: tap,
                     decoration: InputDecoration(
                       labelText: 'Admin PIN',
@@ -253,7 +261,7 @@ class OpenPGPState extends State<OpenPGP> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       InkWell(
-                        onTap: () => _changeUif(keyType, currentPolicy, adminPinController.text),
+                        onTap: () => changeUif(keyType, currentPolicy, pinController.text),
                         borderRadius: BorderRadius.circular(30.0),
                         child: Material(
                           elevation: 1.0,
@@ -290,9 +298,7 @@ class OpenPGPState extends State<OpenPGP> {
     );
   }
 
-  static void showChangeCacheTimeDialog(BuildContext context, String pinPrompt, Function callback) {
-    final cacheTimeController = TextEditingController();
-    final adminPinController = TextEditingController();
+  void showChangeCacheTimeDialog() {
     bool tap = true;
 
     showDialog(
@@ -330,11 +336,11 @@ class OpenPGPState extends State<OpenPGP> {
                 Container(
                   padding: EdgeInsets.only(bottom: 20.0, left: 20.0, right: 20.0),
                   child: TextField(
-                    controller: adminPinController,
+                    controller: pinController,
                     obscureText: tap,
                     decoration: InputDecoration(
-                      labelText: pinPrompt,
-                      hintText: pinPrompt,
+                      labelText: 'Admin PIN',
+                      hintText: 'Admin PIN',
                       border: InputBorder.none,
                       prefixIcon: Icon(Icons.lock_outlined, color: Colors.indigo[500]),
                       suffixIcon: IconButton(
@@ -355,7 +361,7 @@ class OpenPGPState extends State<OpenPGP> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       InkWell(
-                        onTap: () => callback(int.parse(cacheTimeController.text), adminPinController.text),
+                        onTap: () => changeUifCacheTime(int.parse(cacheTimeController.text), pinController.text),
                         borderRadius: BorderRadius.circular(30.0),
                         child: Material(
                           elevation: 1.0,
@@ -392,9 +398,7 @@ class OpenPGPState extends State<OpenPGP> {
     );
   }
 
-  void _showChangePinDialog(PinType pinType) {
-    final oldPinController = TextEditingController();
-    final newPinController = TextEditingController();
+  void showChangePinDialog(PinType pinType) {
     final newPinMinLength = pinType == PinType.adminPin ? 8 : 6;
     bool tapOldPin = true;
     bool tapNewPin = true;
@@ -429,7 +433,7 @@ class OpenPGPState extends State<OpenPGP> {
                 Container(
                   padding: EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0),
                   child: TextField(
-                    controller: oldPinController,
+                    controller: pinController,
                     obscureText: tapOldPin,
                     decoration: InputDecoration(
                       labelText: S.of(context).oldPin,
@@ -481,7 +485,7 @@ class OpenPGPState extends State<OpenPGP> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       InkWell(
-                        onTap: () => _changePin(pinType, oldPinController.text, newPinController.text),
+                        onTap: () => changePin(pinType, pinController.text, newPinController.text),
                         borderRadius: BorderRadius.circular(30.0),
                         child: Material(
                           elevation: 1.0,
@@ -518,7 +522,7 @@ class OpenPGPState extends State<OpenPGP> {
     );
   }
 
-  void _refresh() async {
+  void refresh() async {
     Commons.process(context, () async {
       Commons.assertOK(await FlutterNfcKit.transceive('00A4040006D2760001240100'));
 
@@ -574,12 +578,12 @@ class OpenPGPState extends State<OpenPGP> {
       String name = String.fromCharCodes(info[0x5B]);
 
       setState(() {
-        _card = OpenPGPCard(version, _manufacturers[manufacturerId], sn, name, url, sigKey, encKey, autKey, uifSig, uifEnc, uifAut, cacheTime);
+        card = OpenPGPCard(version, manufacturers[manufacturerId], sn, name, url, sigKey, encKey, autKey, uifSig, uifEnc, uifAut, cacheTime);
       });
     });
   }
 
-  void _changePin(PinType pinType, String oldPin, String newPin) async {
+  void changePin(PinType pinType, String oldPin, String newPin) async {
     Commons.process(context, () async {
       Commons.assertOK(await FlutterNfcKit.transceive('00A4040006D2760001240100'));
       int len = oldPin.length + newPin.length;
@@ -597,30 +601,30 @@ class OpenPGPState extends State<OpenPGP> {
     });
   }
 
-  void _changeUif(KeyType keyType, TouchPolicy newPolicy, String adminPin) async {
+  void changeUif(KeyType keyType, TouchPolicy newPolicy, String adminPin) async {
     Commons.process(context, () async {
       Commons.assertOK(await FlutterNfcKit.transceive('00A4040006D2760001240100'));
-      if (!await _verifyAdminPin(adminPin)) return;
+      if (!await verifyAdminPin(adminPin)) return;
       Commons.assertOK(
-          await FlutterNfcKit.transceive('00DA00' + _getKeyUifTag(keyType) + '02' + newPolicy.toValue().toRadixString(16).padLeft(2, '0') + '20'));
+          await FlutterNfcKit.transceive('00DA00' + getKeyUifTag(keyType) + '02' + newPolicy.toValue().toRadixString(16).padLeft(2, '0') + '20'));
       Navigator.pop(context);
       Flushbar(backgroundColor: Colors.green, message: S.of(context).openpgpUifChanged, duration: Duration(seconds: 3)).show(context);
-      _refresh();
+      refresh();
     });
   }
 
-  void _changeUifCacheTime(int cacheTime, String adminPin) async {
+  void changeUifCacheTime(int cacheTime, String adminPin) async {
     Commons.process(context, () async {
       await FlutterNfcKit.transceive('00A4040006D2760001240100');
-      if (!await _verifyAdminPin(adminPin)) return;
+      if (!await verifyAdminPin(adminPin)) return;
       Commons.assertOK(await FlutterNfcKit.transceive('00DA010201' + cacheTime.toRadixString(16).padLeft(2, '0')));
       Navigator.pop(context);
       Flushbar(backgroundColor: Colors.green, message: S.of(context).openpgpUifCacheTimeChanged, duration: Duration(seconds: 3)).show(context);
-      _refresh();
+      refresh();
     });
   }
 
-  String _getKeyUifTag(KeyType keyType) {
+  String getKeyUifTag(KeyType keyType) {
     switch (keyType) {
       case KeyType.signature:
         return 'D6';
@@ -633,42 +637,42 @@ class OpenPGPState extends State<OpenPGP> {
     }
   }
 
-  Future<bool> _verifyAdminPin(String adminPin) async {
+  Future<bool> verifyAdminPin(String adminPin) async {
     String resp = await FlutterNfcKit.transceive('00200083' + adminPin.length.toRadixString(16).padLeft(2, '0') + hex.encode(adminPin.codeUnits));
     if (Commons.isOK(resp)) return true;
     Commons.promptPinFailureResult(context, resp);
     return false;
   }
-}
 
-Map<int, String> _manufacturers = {
-  0x0001: 'PPC Card Systems',
-  0x0002: 'Prism',
-  0x0003: 'OpenFortress',
-  0x0004: 'Wewid',
-  0x0005: 'ZeitControl',
-  0x0006: 'Yubico',
-  0x0007: 'OpenKMS',
-  0x0008: 'LogoEmail',
-  0x0009: 'Fidesmo',
-  0x000A: 'VivoKey',
-  0x000B: 'Feitian Technologies',
-  0x000D: 'Dangerous Things',
-  0x000E: 'Excelsecu',
-  0x002A: 'Magrathea',
-  0x0042: 'GnuPG e.V.',
-  0x1337: 'Warsaw Hackerspace',
-  0x2342: 'warpzone',
-  0x4354: 'Confidential Technologies',
-  0x5343: 'SSE Carte à puce',
-  0x5443: 'TIF-IT e.V.',
-  0x63AF: 'Trustica',
-  0xBA53: 'c-base e.V.',
-  0xBD0E: 'Paranoidlabs',
-  0xF1D0: 'CanoKeys',
-  0xF517: 'FSIJ',
-  0xF5EC: 'F-Secure',
-};
+  Map<int, String> manufacturers = {
+    0x0001: 'PPC Card Systems',
+    0x0002: 'Prism',
+    0x0003: 'OpenFortress',
+    0x0004: 'Wewid',
+    0x0005: 'ZeitControl',
+    0x0006: 'Yubico',
+    0x0007: 'OpenKMS',
+    0x0008: 'LogoEmail',
+    0x0009: 'Fidesmo',
+    0x000A: 'VivoKey',
+    0x000B: 'Feitian Technologies',
+    0x000D: 'Dangerous Things',
+    0x000E: 'Excelsecu',
+    0x002A: 'Magrathea',
+    0x0042: 'GnuPG e.V.',
+    0x1337: 'Warsaw Hackerspace',
+    0x2342: 'warpzone',
+    0x4354: 'Confidential Technologies',
+    0x5343: 'SSE Carte à puce',
+    0x5443: 'TIF-IT e.V.',
+    0x63AF: 'Trustica',
+    0xBA53: 'c-base e.V.',
+    0xBD0E: 'Paranoidlabs',
+    0xF1D0: 'CanoKeys',
+    0xF517: 'FSIJ',
+    0xF5EC: 'F-Secure',
+  };
+}
 
 enum TouchPolicy { na, off, on, permanent }
 
