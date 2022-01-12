@@ -201,10 +201,6 @@ class OpenPGPState extends State<OpenPGP> {
             );
           }
 
-          divider() {
-            return Container(width: double.infinity, height: 1.0, color: Colors.grey);
-          }
-
           return Dialog(
             elevation: 0.0,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
@@ -216,7 +212,7 @@ class OpenPGPState extends State<OpenPGP> {
                     child: Text(S.of(context).openpgpChangeInteraction(keyType.toText(context)), style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 ),
-                divider(),
+                Divider(color: Colors.black),
                 Container(
                   padding: EdgeInsets.all(20.0),
                   child: Column(
@@ -232,12 +228,17 @@ class OpenPGPState extends State<OpenPGP> {
                     ],
                   ),
                 ),
-                divider(),
+                Divider(color: Colors.black),
                 Container(
                   padding: EdgeInsets.all(20.0),
                   child: TextField(
                     controller: pinController,
                     obscureText: tap,
+                    autofocus: true,
+                    onSubmitted: (String pin) {
+                      if (pin.isEmpty) return;
+                      changeUif(keyType, currentPolicy, pin);
+                    },
                     decoration: InputDecoration(
                       labelText: 'Admin PIN',
                       hintText: 'Admin PIN',
@@ -252,7 +253,7 @@ class OpenPGPState extends State<OpenPGP> {
                     ),
                   ),
                 ),
-                divider(),
+                Divider(color: Colors.black),
                 Container(
                   padding: EdgeInsets.all(20.0),
                   margin: EdgeInsets.only(left: 30.0),
@@ -306,10 +307,6 @@ class OpenPGPState extends State<OpenPGP> {
       barrierDismissible: false,
       builder: (_) {
         return StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
-          divider() {
-            return Container(width: double.infinity, height: 1.0, color: Colors.grey);
-          }
-
           return Dialog(
             elevation: 0.0,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
@@ -319,12 +316,13 @@ class OpenPGPState extends State<OpenPGP> {
                   padding: EdgeInsets.all(20.0),
                   child: Center(child: Text(S.of(context).openpgpChangeTouchCacheTime, style: TextStyle(fontWeight: FontWeight.bold))),
                 ),
-                divider(),
+                Divider(color: Colors.black),
                 Container(
                   padding: EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0),
                   child: TextField(
                     controller: cacheTimeController,
                     keyboardType: TextInputType.number,
+                    autofocus: true,
                     inputFormatters: [new NumericalRangeFormatter(min: 0, max: 255)],
                     decoration: InputDecoration(
                         labelText: S.of(context).openpgpUifCacheTime + ' (0 ~ 255)',
@@ -338,6 +336,10 @@ class OpenPGPState extends State<OpenPGP> {
                   child: TextField(
                     controller: pinController,
                     obscureText: tap,
+                    onSubmitted: (String pin) {
+                      if (pin.isEmpty) return;
+                      changeUifCacheTime(int.parse(cacheTimeController.text), pin);
+                    },
                     decoration: InputDecoration(
                       labelText: 'Admin PIN',
                       hintText: 'Admin PIN',
@@ -352,7 +354,7 @@ class OpenPGPState extends State<OpenPGP> {
                     ),
                   ),
                 ),
-                divider(),
+                Divider(color: Colors.black),
                 Container(
                   padding: EdgeInsets.all(20.0),
                   margin: EdgeInsets.only(left: 30.0),
@@ -409,10 +411,6 @@ class OpenPGPState extends State<OpenPGP> {
       barrierDismissible: false,
       builder: (BuildContext _) {
         return StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
-          divider() {
-            return Container(width: double.infinity, height: 1.0, color: Colors.grey);
-          }
-
           return Dialog(
             elevation: 0.0,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
@@ -425,7 +423,7 @@ class OpenPGPState extends State<OpenPGP> {
                         style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 ),
-                divider(),
+                Divider(color: Colors.black),
                 Container(
                   padding: EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0),
                   child: Text(S.of(context).changePinPrompt(6), style: TextStyle(height: 1.5, fontSize: 15.0)),
@@ -435,6 +433,7 @@ class OpenPGPState extends State<OpenPGP> {
                   child: TextField(
                     controller: pinController,
                     obscureText: tapOldPin,
+                    autofocus: true,
                     decoration: InputDecoration(
                       labelText: S.of(context).oldPin,
                       hintText: S.of(context).oldPin,
@@ -476,7 +475,7 @@ class OpenPGPState extends State<OpenPGP> {
                     ),
                   ),
                 ),
-                divider(),
+                Divider(color: Colors.black),
                 Container(
                   padding: EdgeInsets.all(20.0),
                   margin: EdgeInsets.only(left: 30.0),
