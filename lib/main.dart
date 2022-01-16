@@ -6,6 +6,7 @@ import 'package:flutter_web_frame/flutter_web_frame.dart';
 import 'package:logging/logging.dart';
 import 'package:navigation_history_observer/navigation_history_observer.dart';
 
+import 'components/oath.dart';
 import 'components/openpgp.dart';
 import 'components/settings.dart';
 import 'generated/l10n.dart';
@@ -46,6 +47,7 @@ class MyApp extends StatelessWidget {
           routes: {
             Routes.openpgp: (_) => OpenPGP(),
             Routes.settings: (_) => Settings(),
+            Routes.oath: (_) => OATH(),
           },
         );
       },

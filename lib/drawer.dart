@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:navigation_history_observer/navigation_history_observer.dart';
 
+import 'components/oath.dart';
 import 'components/openpgp.dart';
 import 'components/settings.dart';
 import 'generated/l10n.dart';
@@ -31,7 +32,7 @@ class AppDrawer extends StatelessWidget {
             trailing: Icon(Icons.arrow_forward_ios, size: 15.0, color: Colors.black),
           ),
           ListTile(
-            onTap: () {},
+            onTap: () => doRoute(context, OATH.routeName),
             leading: Icon(Icons.timer, color: Colors.black),
             title: Text('TOTP / HOTP', style: TextStyle(color: Colors.black)),
             trailing: Icon(Icons.arrow_forward_ios, size: 15.0, color: Colors.black),

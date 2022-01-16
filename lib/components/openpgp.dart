@@ -19,10 +19,10 @@ class OpenPGP extends StatefulWidget {
   static const String routeName = '/openpgp';
 
   @override
-  OpenPGPState createState() => OpenPGPState();
+  _OpenPGPState createState() => _OpenPGPState();
 }
 
-class OpenPGPState extends State<OpenPGP> {
+class _OpenPGPState extends State<OpenPGP> {
   TextEditingController cacheTimeController = TextEditingController();
   TextEditingController pinController = TextEditingController();
   TextEditingController newPinController = TextEditingController();
