@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:logging/logging.dart';
 
@@ -70,7 +72,7 @@ class _OATHState extends State<OATH> {
     super.dispose();
   }
 
-  Widget itemTile(double width, IconData icon, String title, String subtitle, bool requireTouch, bool isHotp) {
+  Widget itemTile(double width, IconData icon, String code, String name, bool requireTouch, bool isHotp) {
     return Container(
       padding: EdgeInsets.all(10.0),
       child: Column(
@@ -96,27 +98,45 @@ class _OATHState extends State<OATH> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text((requireTouch || isHotp) ? '*** ***' : title,
-                          style: TextStyle(fontSize: 17.0, fontWeight: FontWeight.bold, color: Colors.indigo[500])),
+                      Text(code.isEmpty ? '*** ***' : code, style: TextStyle(fontSize: 17.0, fontWeight: FontWeight.bold, color: Colors.indigo[500])),
                       SizedBox(height: 5.0),
-                      Text(subtitle, style: TextStyle(fontSize: 15.0, color: Colors.grey)),
+                      Text(name, style: TextStyle(fontSize: 15.0, color: Colors.grey)),
                     ],
                   ),
                 ),
                 if (requireTouch)
-                  Container(
-                    height: 56.0,
-                    width: 56.0,
-                    alignment: Alignment.center,
-                    child: Icon(Icons.touch_app, size: 28.0, color: Colors.indigo[500]),
+                  InkWell(
+                    onTap: () => calculate(name, false),
+                    child: Container(
+                      height: 56.0,
+                      width: 56.0,
+                      alignment: Alignment.center,
+                      child: Icon(Icons.touch_app, size: 28.0, color: Colors.indigo[500]),
+                    ),
                   ),
                 if (isHotp)
-                  Container(
-                    height: 56.0,
-                    width: 56.0,
-                    alignment: Alignment.center,
-                    child: Icon(Icons.refresh, size: 28.0, color: Colors.indigo[500]),
+                  InkWell(
+                    onTap: () => calculate(name, true),
+                    child: Container(
+                      height: 56.0,
+                      width: 56.0,
+                      alignment: Alignment.center,
+                      child: Icon(Icons.refresh, size: 28.0, color: Colors.indigo[500]),
+                    ),
                   ),
+                PopupMenuButton(
+                  itemBuilder: (BuildContext context) => [
+                    PopupMenuItem(value: 0, child: Text('Copy to Clipboard')),
+                    PopupMenuItem(value: 1, child: Text('Delete')),
+                    if (isHotp) PopupMenuItem(value: 2, child: Text('Set as Default')),
+                  ],
+                  onSelected: (idx) {
+                    if (idx == 0) { // copy
+                      Clipboard.setData(ClipboardData(text: code));
+                    }
+                  },
+                  icon: Icon(Icons.more_horiz, size: 28.0, color: Colors.indigo[500]),
+                ),
               ],
             ),
           ),
@@ -149,6 +169,33 @@ class _OATHState extends State<OATH> {
     });
   }
 
+  void calculate(String name, bool isHotp) async {
+    Commons.process(context, () async {
+      String resp = await transceive('00A4040007A0000005272101');
+      Commons.assertOK(resp);
+      if (resp == '9000') {
+        version = Version.legacy;
+      } else if (resp.substring(4, 10) == '050505') {
+        version = Version.v1;
+      }
+      Uint8List nameBytes = utf8.encode(name);
+      String capduData = '71' + nameBytes.length.toRadixString(16).padLeft(2, '0') + hex.encode(nameBytes);
+      if (!isHotp) {
+        int challenge = DateTime.now().millisecondsSinceEpoch ~/ 30000;
+        String challengeStr = challenge.toRadixString(16).padLeft(16, '0');
+        capduData += '7408$challengeStr';
+      }
+      if (version == Version.v1) {
+        resp = await transceive('00A20001' + (capduData.length ~/ 2).toRadixString(16).padLeft(2, '0') + capduData);
+        Uint8List data = hex.decode(Commons.dropSW(resp));
+        String code = parseResponse(data.sublist(2));
+        setState(() {
+          items.firstWhere((e) => e.name == name).code = code;
+        });
+      }
+    });
+  }
+
   List<OathItem> parseV1(Uint8List data) {
     List<OathItem> result = [];
     int pos = 0;
@@ -156,8 +203,6 @@ class _OATHState extends State<OATH> {
       OathItem item = parseSingleV1(data.sublist(pos));
       pos += item._length;
       result.add(item);
-      print(item.name);
-      print(item.code);
     }
     return result;
   }
@@ -167,7 +212,7 @@ class _OATHState extends State<OATH> {
     assert(data[0] == 0x71);
     int nameLen = data[1];
     assert(4 + nameLen <= data.length);
-    String name = String.fromCharCodes(data.sublist(2, 2 + nameLen));
+    String name = utf8.decode(data.sublist(2, 2 + nameLen));
     int dataLen = data[3 + nameLen];
     assert(4 + nameLen + dataLen <= data.length);
     OathItem item = OathItem(name);
