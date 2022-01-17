@@ -25,6 +25,8 @@
   "changePinPrompt": "New PIN should be at least {min} characters long. The maximum length is 64.",
   "pinChanged": "PIN has been successfully changed.",
   "pinInvalidLength": "Invalid length",
+  "warning": "Warning",
+  "delete": "Delete",
 
   "openpgpCardInfo": "Card Info",
   "openpgpVersion": "Version",
@@ -66,10 +68,11 @@
   "settingsResetPIV": "Reset PIV",
   "settingsResetOATH": "Reset TOTP/HOTP",
   "settingsResetNDEF": "Reset NDEF",
-  "settingsWarning": "Warning",
   "settingsResetApplet": "This operation will RESET all data of {applet}! Please input your PIN to confirm.",
   "settingsResetAll": "All data is about to be erased. When you confirm, the CanoKey will blink repeatedly. Touch while it is blinking until success.",
   "settingsResetSuccess": "Successfully reset",
   "settingsResetConditionNotSatisfying": "PIN has not been locked yet",
-  "settingsResetPresenceTestFailed": "You did not touch the pad in time"
+  "settingsResetPresenceTestFailed": "You did not touch the pad in time",
+
+  "oathDelete": "This action will delete the account {name} from your CanoKey. Make sure 2FA has been disabled on the web service."
 }

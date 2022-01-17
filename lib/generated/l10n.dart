@@ -295,6 +295,26 @@ class S {
     );
   }
 
+  /// `Warning`
+  String get warning {
+    return Intl.message(
+      'Warning',
+      name: 'warning',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Delete`
+  String get delete {
+    return Intl.message(
+      'Delete',
+      name: 'delete',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Card Info`
   String get openpgpCardInfo {
     return Intl.message(
@@ -685,16 +705,6 @@ class S {
     );
   }
 
-  /// `Warning`
-  String get settingsWarning {
-    return Intl.message(
-      'Warning',
-      name: 'settingsWarning',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `This operation will RESET all data of {applet}! Please input your PIN to confirm.`
   String settingsResetApplet(Object applet) {
     return Intl.message(
@@ -742,6 +752,16 @@ class S {
       name: 'settingsResetPresenceTestFailed',
       desc: '',
       args: [],
+    );
+  }
+
+  /// `This action will delete the account {name} from your CanoKey. Make sure 2FA has been disabled on the web service.`
+  String oathDelete(Object name) {
+    return Intl.message(
+      'This action will delete the account $name from your CanoKey. Make sure 2FA has been disabled on the web service.',
+      name: 'oathDelete',
+      desc: '',
+      args: [name],
     );
   }
 }

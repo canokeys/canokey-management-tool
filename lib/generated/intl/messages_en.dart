@@ -21,11 +21,13 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m0(min) => "New PIN should be at least ${min} characters long. The maximum length is 64.";
 
-  static m1(keyType) => "Change ${keyType} Key\'s Touch Policy";
+  static m1(name) => "This action will delete the account ${name} from your CanoKey. Make sure 2FA has been disabled on the web service.";
 
-  static m2(retries) => "Incorrect PIN. ${retries} retries left.";
+  static m2(keyType) => "Change ${keyType} Key\'s Touch Policy";
 
-  static m3(applet) => "This operation will RESET all data of ${applet}! Please input your PIN to confirm.";
+  static m3(retries) => "Incorrect PIN. ${retries} retries left.";
+
+  static m4(applet) => "This operation will RESET all data of ${applet}! Please input your PIN to confirm.";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -37,10 +39,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "changePinPrompt" : m0,
     "close" : MessageLookupByLibrary.simpleMessage("Close"),
     "confirm" : MessageLookupByLibrary.simpleMessage("Confirm"),
+    "delete" : MessageLookupByLibrary.simpleMessage("Delete"),
     "home" : MessageLookupByLibrary.simpleMessage("Home"),
     "homeScreenTitle" : MessageLookupByLibrary.simpleMessage("CanoKey Management Tool"),
     "networkError" : MessageLookupByLibrary.simpleMessage("CanoKey is busy. Replug it, wait for a moment, and retry."),
     "newPin" : MessageLookupByLibrary.simpleMessage("New PIN"),
+    "oathDelete" : m1,
     "off" : MessageLookupByLibrary.simpleMessage("Off"),
     "oldPin" : MessageLookupByLibrary.simpleMessage("Old PIN"),
     "on" : MessageLookupByLibrary.simpleMessage("On"),
@@ -48,7 +52,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "openpgpCardHolder" : MessageLookupByLibrary.simpleMessage("Card Holder"),
     "openpgpCardInfo" : MessageLookupByLibrary.simpleMessage("Card Info"),
     "openpgpChangeAdminPin" : MessageLookupByLibrary.simpleMessage("Change Admin PIN"),
-    "openpgpChangeInteraction" : m1,
+    "openpgpChangeInteraction" : m2,
     "openpgpChangeTouchCacheTime" : MessageLookupByLibrary.simpleMessage("Change Touch Cache Time"),
     "openpgpEncryption" : MessageLookupByLibrary.simpleMessage("Encryption"),
     "openpgpKeyNone" : MessageLookupByLibrary.simpleMessage("[none]"),
@@ -69,7 +73,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "pinIncorrect" : MessageLookupByLibrary.simpleMessage("Incorrect PIN."),
     "pinInvalidLength" : MessageLookupByLibrary.simpleMessage("Invalid length"),
     "pinLength" : MessageLookupByLibrary.simpleMessage("The provided PIN is too short or too long."),
-    "pinRetries" : m2,
+    "pinRetries" : m3,
     "pollCanceled" : MessageLookupByLibrary.simpleMessage("No CanoKey is selected."),
     "pollCanoKey" : MessageLookupByLibrary.simpleMessage("Please read your CanoKey by clicking the refresh button"),
     "save" : MessageLookupByLibrary.simpleMessage("Save"),
@@ -88,7 +92,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "settingsOtherSettings" : MessageLookupByLibrary.simpleMessage("Other Settings"),
     "settingsReset" : MessageLookupByLibrary.simpleMessage("Reset"),
     "settingsResetAll" : MessageLookupByLibrary.simpleMessage("All data is about to be erased. When you confirm, the CanoKey will blink repeatedly. Touch while it is blinking until success."),
-    "settingsResetApplet" : m3,
+    "settingsResetApplet" : m4,
     "settingsResetConditionNotSatisfying" : MessageLookupByLibrary.simpleMessage("PIN has not been locked yet"),
     "settingsResetNDEF" : MessageLookupByLibrary.simpleMessage("Reset NDEF"),
     "settingsResetOATH" : MessageLookupByLibrary.simpleMessage("Reset TOTP/HOTP"),
@@ -97,8 +101,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "settingsResetPresenceTestFailed" : MessageLookupByLibrary.simpleMessage("You did not touch the pad in time"),
     "settingsResetSuccess" : MessageLookupByLibrary.simpleMessage("Successfully reset"),
     "settingsSN" : MessageLookupByLibrary.simpleMessage("Serial Number"),
-    "settingsWarning" : MessageLookupByLibrary.simpleMessage("Warning"),
     "settingsWebUSB" : MessageLookupByLibrary.simpleMessage("WebUSB prompt when plug-in"),
-    "successfullyChanged" : MessageLookupByLibrary.simpleMessage("Successfully changed")
+    "successfullyChanged" : MessageLookupByLibrary.simpleMessage("Successfully changed"),
+    "warning" : MessageLookupByLibrary.simpleMessage("Warning")
   };
 }

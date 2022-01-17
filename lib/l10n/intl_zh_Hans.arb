@@ -25,6 +25,8 @@
   "pinChanged": "PIN 修改成功",
   "changePinPrompt": "新 PIN 的长度应当为 {min} - 64 个字符。",
   "pinInvalidLength": "长度错误",
+  "warning": "警告",
+  "delete": "删除",
 
   "openpgpCardInfo": "卡片信息",
   "openpgpVersion": "版本",
@@ -66,10 +68,11 @@
   "settingsResetPIV": "重置 PIV",
   "settingsResetOATH": "重置 TOTP/HOTP",
   "settingsResetNDEF": "重置 NDEF",
-  "settingsWarning": "警告",
   "settingsResetApplet": "该操作将抹除 {applet} 的全部数据！请输入您的 PIN 以确认。",
   "settingsResetAll": "即将抹除全部数据。当您确认后，CanoKey 将会反复闪烁，请在闪烁时触摸，直到提示成功。",
   "settingsResetSuccess": "重置成功",
   "settingsResetConditionNotSatisfying": "PIN 尚未锁定",
-  "settingsResetPresenceTestFailed": "请按提示触摸"
+  "settingsResetPresenceTestFailed": "请按提示触摸",
+
+  "oathDelete": "您正在删除{name}，删除该项目后无法恢复！请确认相关服务的二步验证已经关闭。"
 }

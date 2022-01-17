@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:another_flushbar/flushbar.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -130,9 +131,16 @@ class _OATHState extends State<OATH> {
                     PopupMenuItem(value: 1, child: Text('Delete')),
                     if (isHotp) PopupMenuItem(value: 2, child: Text('Set as Default')),
                   ],
-                  onSelected: (idx) {
+                  onSelected: (idx) async {
                     if (idx == 0) { // copy
+                      if (code.isEmpty) {
+                        code = await calculate(name, isHotp);
+                      }
                       Clipboard.setData(ClipboardData(text: code));
+                    } else if (idx == 1) { // delete
+                      showDeleteDialog(name);
+                    } else if (idx == 2) { // set default
+                      setDefault(name);
                     }
                   },
                   icon: Icon(Icons.more_horiz, size: 28.0, color: Colors.indigo[500]),
@@ -147,7 +155,61 @@ class _OATHState extends State<OATH> {
     );
   }
 
-  void refresh() async {
+  void showDeleteDialog(String name) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext _) {
+        return StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
+          return Dialog(
+            elevation: 0.0,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+            child: Wrap(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(20.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Text(S.of(context).warning, style: TextStyle(fontWeight: FontWeight.bold)),
+                      Divider(color: Colors.black),
+                      SizedBox(height: 10.0),
+                      Text(S.of(context).oathDelete(name)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: <Widget>[
+                          InkWell(
+                            onTap: () => Navigator.pop(context),
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: EdgeInsets.all(10.0),
+                              child: Text(S.of(context).cancel, style: TextStyle(fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () => delete(name),
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: EdgeInsets.all(10.0),
+                              decoration: BoxDecoration(),
+                              child: Text(S.of(context).delete, style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+      },
+    );
+  }
+
+  void refresh() {
     Commons.process(context, () async {
       String resp = await transceive('00A4040007A0000005272101');
       Commons.assertOK(resp);
@@ -169,8 +231,9 @@ class _OATHState extends State<OATH> {
     });
   }
 
-  void calculate(String name, bool isHotp) async {
-    Commons.process(context, () async {
+  Future<String> calculate(String name, bool isHotp) async {
+    String code;
+    await Commons.process(context, () async {
       String resp = await transceive('00A4040007A0000005272101');
       Commons.assertOK(resp);
       if (resp == '9000') {
@@ -187,12 +250,38 @@ class _OATHState extends State<OATH> {
       }
       if (version == Version.v1) {
         resp = await transceive('00A20001' + (capduData.length ~/ 2).toRadixString(16).padLeft(2, '0') + capduData);
+        Commons.assertOK(resp);
         Uint8List data = hex.decode(Commons.dropSW(resp));
-        String code = parseResponse(data.sublist(2));
+        code = parseResponse(data.sublist(2));
         setState(() {
           items.firstWhere((e) => e.name == name).code = code;
         });
       }
+    });
+    return code;
+  }
+
+  void delete(String name) {
+    Commons.process(context, () async {
+      String resp = await transceive('00A4040007A0000005272101');
+      Commons.assertOK(resp);
+      Uint8List nameBytes = utf8.encode(name);
+      String capduData = '71' + nameBytes.length.toRadixString(16).padLeft(2, '0') + hex.encode(nameBytes);
+      Commons.assertOK(await transceive('00020000' + (capduData.length ~/ 2).toRadixString(16).padLeft(2, '0') + capduData));
+      Navigator.pop(context);
+      refresh();
+    });
+  }
+
+  void setDefault(String name) {
+    Commons.process(context, () async {
+      String resp = await transceive('00A4040007A0000005272101');
+      Commons.assertOK(resp);
+      Uint8List nameBytes = utf8.encode(name);
+      String capduData = '71' + nameBytes.length.toRadixString(16).padLeft(2, '0') + hex.encode(nameBytes);
+      Commons.assertOK(await transceive('00550000' + (capduData.length ~/ 2).toRadixString(16).padLeft(2, '0') + capduData));
+      Flushbar(backgroundColor: Colors.green, message: S.of(context).successfullyChanged, duration: Duration(seconds: 3)).show(context);
+      refresh();
     });
   }
 

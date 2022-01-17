@@ -20,7 +20,7 @@ class Commons {
     }
   }
 
-  static void process(BuildContext context, Function f) async {
+  static Future<void> process(BuildContext context, Function f) async {
     try {
       await FlutterNfcKit.poll();
       await f();

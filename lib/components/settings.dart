@@ -451,7 +451,7 @@ class _SettingsState extends State<Settings> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    Text(S.of(context).settingsWarning, style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text(S.of(context).warning, style: TextStyle(fontWeight: FontWeight.bold)),
                     Divider(color: Colors.black),
                     SizedBox(height: 10.0),
                     Text(S.of(context).settingsResetAll),
@@ -507,7 +507,7 @@ class _SettingsState extends State<Settings> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
-                      Text(S.of(context).settingsWarning, style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text(S.of(context).warning, style: TextStyle(fontWeight: FontWeight.bold)),
                       Divider(color: Colors.black),
                       SizedBox(height: 10.0),
                       Text(S.of(context).settingsResetApplet(applet.name)),

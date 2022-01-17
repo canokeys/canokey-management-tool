@@ -198,7 +198,7 @@ packages:
     description:
       path: "."
       ref: webusb_support
-      resolved-ref: "6b0d2eb3a2e83438672948baa88762ea4008b60f"
+      resolved-ref: bdfe25216c4234b6dfb84d11d16cff58303a2c76
       url: "https://github.com/nfcim/flutter_nfc_kit.git"
     source: git
     version: "3.2.0"
@@ -580,7 +580,7 @@ packages:
       name: win32
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.3.3"
+    version: "2.3.6"
   xdg_directories:
     dependency: transitive
     description:
