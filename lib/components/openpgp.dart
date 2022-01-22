@@ -521,12 +521,12 @@ class _OpenPGPState extends State<OpenPGP> {
     );
   }
 
-  void refresh() async {
+  void refresh() {
     Commons.process(context, () async {
-      Commons.assertOK(await FlutterNfcKit.transceive('00A4040006D2760001240100'));
+      Commons.assertOK(await transceive('00A4040006D2760001240100'));
 
       // parse general info
-      String resp = await FlutterNfcKit.transceive('00CA006E00');
+      String resp = await transceive('00CA006E00');
       Commons.assertOK(resp);
       Map info = TLV.parse(hex.decode(Commons.dropSW(resp)));
       Uint8List aid = info[0x4F];
@@ -562,16 +562,16 @@ class _OpenPGPState extends State<OpenPGP> {
         uifSig = touchPolicyFromValue(info[0x73][0xD6][0]);
         uifEnc = touchPolicyFromValue(info[0x73][0xD7][0]);
         uifAut = touchPolicyFromValue(info[0x73][0xD8][0]);
-        resp = await FlutterNfcKit.transceive('00CA010200');
+        resp = await transceive('00CA010200');
         Commons.assertOK(resp);
         cacheTime = hex.decode(Commons.dropSW(resp))[0];
       }
 
       // parse personal info
-      resp = await FlutterNfcKit.transceive('00CA5F5000');
+      resp = await transceive('00CA5F5000');
       Commons.assertOK(resp);
       String url = String.fromCharCodes(hex.decode(Commons.dropSW(resp)));
-      resp = await FlutterNfcKit.transceive('00CA006500');
+      resp = await transceive('00CA006500');
       Commons.assertOK(resp);
       info = TLV.parse(hex.decode(Commons.dropSW(resp)));
       String name = String.fromCharCodes(info[0x5B]);
@@ -582,11 +582,11 @@ class _OpenPGPState extends State<OpenPGP> {
     });
   }
 
-  void changePin(PinType pinType, String oldPin, String newPin) async {
+  void changePin(PinType pinType, String oldPin, String newPin) {
     Commons.process(context, () async {
-      Commons.assertOK(await FlutterNfcKit.transceive('00A4040006D2760001240100'));
+      Commons.assertOK(await transceive('00A4040006D2760001240100'));
       int len = oldPin.length + newPin.length;
-      String resp = await FlutterNfcKit.transceive('002400' +
+      String resp = await transceive('002400' +
           (pinType == PinType.pin ? '81' : '83') +
           len.toRadixString(16).padLeft(2, '0') +
           hex.encode(oldPin.codeUnits) +
@@ -600,23 +600,23 @@ class _OpenPGPState extends State<OpenPGP> {
     });
   }
 
-  void changeUif(KeyType keyType, TouchPolicy newPolicy, String adminPin) async {
+  void changeUif(KeyType keyType, TouchPolicy newPolicy, String adminPin) {
     Commons.process(context, () async {
-      Commons.assertOK(await FlutterNfcKit.transceive('00A4040006D2760001240100'));
+      Commons.assertOK(await transceive('00A4040006D2760001240100'));
       if (!await verifyAdminPin(adminPin)) return;
       Commons.assertOK(
-          await FlutterNfcKit.transceive('00DA00' + getKeyUifTag(keyType) + '02' + newPolicy.toValue().toRadixString(16).padLeft(2, '0') + '20'));
+          await transceive('00DA00' + getKeyUifTag(keyType) + '02' + newPolicy.toValue().toRadixString(16).padLeft(2, '0') + '20'));
       Navigator.pop(context);
       Flushbar(backgroundColor: Colors.green, message: S.of(context).openpgpUifChanged, duration: Duration(seconds: 3)).show(context);
       refresh();
     });
   }
 
-  void changeUifCacheTime(int cacheTime, String adminPin) async {
+  void changeUifCacheTime(int cacheTime, String adminPin) {
     Commons.process(context, () async {
-      await FlutterNfcKit.transceive('00A4040006D2760001240100');
+      await transceive('00A4040006D2760001240100');
       if (!await verifyAdminPin(adminPin)) return;
-      Commons.assertOK(await FlutterNfcKit.transceive('00DA010201' + cacheTime.toRadixString(16).padLeft(2, '0')));
+      Commons.assertOK(await transceive('00DA010201' + cacheTime.toRadixString(16).padLeft(2, '0')));
       Navigator.pop(context);
       Flushbar(backgroundColor: Colors.green, message: S.of(context).openpgpUifCacheTimeChanged, duration: Duration(seconds: 3)).show(context);
       refresh();
@@ -637,10 +637,25 @@ class _OpenPGPState extends State<OpenPGP> {
   }
 
   Future<bool> verifyAdminPin(String adminPin) async {
-    String resp = await FlutterNfcKit.transceive('00200083' + adminPin.length.toRadixString(16).padLeft(2, '0') + hex.encode(adminPin.codeUnits));
+    String resp = await transceive('00200083' + adminPin.length.toRadixString(16).padLeft(2, '0') + hex.encode(adminPin.codeUnits));
     if (Commons.isOK(resp)) return true;
     Commons.promptPinFailureResult(context, resp);
     return false;
+  }
+
+  Future<String> transceive(String capdu) async {
+    String rapdu = '';
+    do {
+      if (rapdu.length >= 4) {
+        var remain = rapdu.substring(rapdu.length - 2);
+        if (remain != '') {
+          capdu = '00C00000$remain';
+          rapdu = rapdu.substring(0, rapdu.length - 4);
+        }
+      }
+      rapdu += await FlutterNfcKit.transceive(capdu);
+    } while (rapdu.substring(rapdu.length - 4, rapdu.length - 2) == '61');
+    return rapdu;
   }
 
   Map<int, String> manufacturers = {

@@ -8,12 +8,10 @@ class NumericalRangeFormatter extends TextInputFormatter {
 
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
-    if (newValue.text == '') {
-      return newValue;
-    } else if (int.parse(newValue.text) < min) {
-      return TextEditingValue().copyWith(text: min.toStringAsFixed(2));
-    } else {
-      return int.parse(newValue.text) > max ? oldValue : newValue;
-    }
+    if (newValue.text == '') return newValue;
+    int value = int.tryParse(newValue.text);
+    if (value == null) return oldValue;
+    if (value < min) return TextEditingValue().copyWith(text: min.toString());
+    return value > max ? oldValue : newValue;
   }
 }

@@ -33,7 +33,7 @@ class Commons {
         Flushbar(backgroundColor: Colors.red, message: e.message, duration: Duration(seconds: 3)).show(context);
       }
     } finally {
-      FlutterNfcKit.finish();
+      FlutterNfcKit.finish(closeWebUSB: false);
     }
   }
 

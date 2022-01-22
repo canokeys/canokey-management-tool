@@ -27,6 +27,8 @@
   "pinInvalidLength": "Invalid length",
   "warning": "Warning",
   "delete": "Delete",
+  "add": "Add",
+  "reset": "Reset",
 
   "openpgpCardInfo": "Card Info",
   "openpgpVersion": "Version",
@@ -53,7 +55,6 @@
   "settingsInfo": "CanoKey Info",
   "settingsOtherSettings": "Other Settings",
   "settingsLanguage": "Language",
-  "settingsReset": "Reset",
   "settingsModel": "Model",
   "settingsFirmwareVersion": "Firmware Version",
   "settingsSN": "Serial Number",
@@ -74,5 +75,23 @@
   "settingsResetConditionNotSatisfying": "PIN has not been locked yet",
   "settingsResetPresenceTestFailed": "You did not touch the pad in time",
 
-  "oathDelete": "This action will delete the account {name} from your CanoKey. Make sure 2FA has been disabled on the web service."
+  "oathDelete": "This action will delete the account {name} from your CanoKey. Make sure 2FA has been disabled on the web service.",
+  "oathCopy": "Copy to Clipboard",
+  "oathSetDefault": "Set as Default",
+  "oathAddAccount": "Add Account",
+  "oathIssuer": "Issuer",
+  "oathAccount": "Account name",
+  "oathSecret": "Secret key",
+  "oathType": "Type",
+  "oathAlgorithm": "Algorithm",
+  "oathDigits": "Digits",
+  "oathPeriod": "Period",
+  "oathRequireTouch": "Require Touch",
+  "oathRequired": "Required",
+  "oathTooLong": "Too long",
+  "oathCounter": "Counter",
+  "oathCounterMustBeNumber": "Not a number",
+  "oathInvalidKey": "Invalid secret key",
+  "oathDeleted": "Successfully deleted",
+  "oathAdded": "Successfully added"
 }

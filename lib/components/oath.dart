@@ -7,9 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:logging/logging.dart';
+import 'package:base32/base32.dart';
 
 import '../drawer.dart';
 import '../generated/l10n.dart';
+import '../utils/NumericalRangeFormatter.dart';
 import '../utils/commons.dart';
 
 final log = Logger('ManagementTool:OATH');
@@ -25,8 +27,11 @@ class _OATHState extends State<OATH> {
   bool polled = false;
   List<OathItem> items = [];
   Version version;
-  TextEditingController pinController = TextEditingController();
-  TextEditingController newPinController = TextEditingController();
+  TextEditingController issuerController = TextEditingController();
+  TextEditingController accountController = TextEditingController();
+  TextEditingController secretKeyController = TextEditingController();
+  TextEditingController periodController = TextEditingController(text: '30');
+  TextEditingController counterController = TextEditingController(text: '0');
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +43,23 @@ class _OATHState extends State<OATH> {
         titleSpacing: 0.0,
         centerTitle: true,
         title: Text('TOTP / HOTP', style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.white)),
-        actions: [IconButton(icon: Icon(Icons.refresh), onPressed: refresh)],
+        actions: [
+          PopupMenuButton(
+            itemBuilder: (BuildContext context) => [
+              PopupMenuItem(value: 0, child: Text(S.of(context).add)),
+              PopupMenuItem(value: 1, child: Text('Set Password')),
+              PopupMenuItem(value: 2, child: Text(S.of(context).reset)),
+            ],
+            onSelected: (idx) async {
+              if (idx == 0) {
+                showAddDialog();
+              } else if (idx == 1) {
+              } else if (idx == 2) {}
+            },
+            icon: Icon(Icons.more_vert),
+          ),
+          IconButton(icon: Icon(Icons.refresh), onPressed: refresh),
+        ],
       ),
       drawer: AppDrawer(),
       body: Container(
@@ -57,7 +78,7 @@ class _OATHState extends State<OATH> {
                 shrinkWrap: true,
                 itemCount: items.length,
                 itemBuilder: (context, index) =>
-                    itemTile(width, Icons.pin, items[index].code, items[index].name, items[index].requireTouch, items[index].isHotp),
+                    itemTile(width, Icons.pin, items[index].code, items[index].name, items[index].requireTouch, items[index].type),
               ),
             ]
           ],
@@ -68,12 +89,14 @@ class _OATHState extends State<OATH> {
 
   @override
   void dispose() {
-    pinController.dispose();
-    newPinController.dispose();
+    issuerController.dispose();
+    accountController.dispose();
+    secretKeyController.dispose();
+    periodController.dispose();
     super.dispose();
   }
 
-  Widget itemTile(double width, IconData icon, String code, String name, bool requireTouch, bool isHotp) {
+  Widget itemTile(double width, IconData icon, String code, String name, bool requireTouch, Type type) {
     return Container(
       padding: EdgeInsets.all(10.0),
       child: Column(
@@ -107,7 +130,7 @@ class _OATHState extends State<OATH> {
                 ),
                 if (requireTouch)
                   InkWell(
-                    onTap: () => calculate(name, false),
+                    onTap: () => calculate(name, type),
                     child: Container(
                       height: 56.0,
                       width: 56.0,
@@ -115,9 +138,9 @@ class _OATHState extends State<OATH> {
                       child: Icon(Icons.touch_app, size: 28.0, color: Colors.indigo[500]),
                     ),
                   ),
-                if (isHotp)
+                if (type == Type.hotp)
                   InkWell(
-                    onTap: () => calculate(name, true),
+                    onTap: () => calculate(name, type),
                     child: Container(
                       height: 56.0,
                       width: 56.0,
@@ -127,19 +150,22 @@ class _OATHState extends State<OATH> {
                   ),
                 PopupMenuButton(
                   itemBuilder: (BuildContext context) => [
-                    PopupMenuItem(value: 0, child: Text('Copy to Clipboard')),
-                    PopupMenuItem(value: 1, child: Text('Delete')),
-                    if (isHotp) PopupMenuItem(value: 2, child: Text('Set as Default')),
+                    PopupMenuItem(value: 0, child: Text(S.of(context).oathCopy)),
+                    PopupMenuItem(value: 1, child: Text(S.of(context).delete)),
+                    if (type == Type.hotp) PopupMenuItem(value: 2, child: Text(S.of(context).oathSetDefault)),
                   ],
                   onSelected: (idx) async {
-                    if (idx == 0) { // copy
+                    if (idx == 0) {
+                      // copy
                       if (code.isEmpty) {
-                        code = await calculate(name, isHotp);
+                        code = await calculate(name, type);
                       }
                       Clipboard.setData(ClipboardData(text: code));
-                    } else if (idx == 1) { // delete
+                    } else if (idx == 1) {
+                      // delete
                       showDeleteDialog(name);
-                    } else if (idx == 2) { // set default
+                    } else if (idx == 2) {
+                      // set default
                       setDefault(name);
                     }
                   },
@@ -153,6 +179,196 @@ class _OATHState extends State<OATH> {
         ],
       ),
     );
+  }
+
+  void showAddDialog() {
+    Type type = Type.totp;
+    Algorithm algo = Algorithm.sha1;
+    int digits = 6;
+    bool requireTouch = false;
+    String accountErrorText, secretKeyErrorText, periodErrorText, counterErrorText;
+
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) => Dialog(
+                elevation: 0.0,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                child: Wrap(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(20.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Text(S.of(context).oathAddAccount, style: TextStyle(fontWeight: FontWeight.bold)),
+                          Divider(color: Colors.black),
+                          SizedBox(height: 10.0),
+                          Container(
+                            padding: EdgeInsets.only(left: 20.0, right: 20.0),
+                            child: TextField(
+                              controller: issuerController,
+                              decoration: InputDecoration(labelText: S.of(context).oathIssuer),
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(left: 20.0, right: 20.0),
+                            child: TextField(
+                              controller: accountController,
+                              decoration: InputDecoration(labelText: S.of(context).oathAccount, errorText: accountErrorText),
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(left: 20.0, right: 20.0),
+                            child: TextField(
+                              controller: secretKeyController,
+                              decoration: InputDecoration(labelText: S.of(context).oathSecret, errorText: secretKeyErrorText),
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(left: 20.0, right: 20.0),
+                            child: Wrap(
+                              spacing: 15.0,
+                              runSpacing: 15.0,
+                              children: [
+                                FractionallySizedBox(
+                                  widthFactor: 0.45,
+                                  child: DropdownButtonFormField(
+                                    isExpanded: true,
+                                    decoration: InputDecoration(labelText: S.of(context).oathType),
+                                    value: type,
+                                    items: [
+                                      DropdownMenuItem(child: Text('TOTP'), value: Type.totp),
+                                      DropdownMenuItem(child: Text('HOTP'), value: Type.hotp),
+                                    ],
+                                    onChanged: (e) => {
+                                      setState(() => {type = e})
+                                    },
+                                  ),
+                                ),
+                                FractionallySizedBox(
+                                  widthFactor: 0.45,
+                                  child: DropdownButtonFormField(
+                                    isExpanded: true,
+                                    decoration: InputDecoration(labelText: S.of(context).oathAlgorithm),
+                                    value: algo,
+                                    items: [
+                                      DropdownMenuItem(child: Text('SHA-1'), value: Algorithm.sha1),
+                                      DropdownMenuItem(child: Text('SHA-256'), value: Algorithm.sha256),
+                                      DropdownMenuItem(child: Text('SHA-512'), value: Algorithm.sha512),
+                                    ],
+                                    onChanged: (e) => {algo = e},
+                                  ),
+                                ),
+                                FractionallySizedBox(
+                                  widthFactor: 0.45,
+                                  child: DropdownButtonFormField(
+                                    isExpanded: true,
+                                    decoration: InputDecoration(labelText: S.of(context).oathDigits),
+                                    value: digits,
+                                    items: [
+                                      DropdownMenuItem(child: Text('5'), value: 5),
+                                      DropdownMenuItem(child: Text('6'), value: 6),
+                                      DropdownMenuItem(child: Text('7'), value: 7),
+                                      DropdownMenuItem(child: Text('8'), value: 8),
+                                    ],
+                                    onChanged: (e) => {digits = e},
+                                  ),
+                                ),
+                                if (type == Type.totp)
+                                  FractionallySizedBox(
+                                    widthFactor: 0.45,
+                                    child: TextField(
+                                      controller: periodController,
+                                      keyboardType: TextInputType.number,
+                                      inputFormatters: [new NumericalRangeFormatter(min: 1, max: 99)],
+                                      decoration: InputDecoration(labelText: S.of(context).oathPeriod, errorText: periodErrorText),
+                                      style: TextStyle(fontSize: 19),
+                                    ),
+                                  )
+                                else
+                                  FractionallySizedBox(
+                                    widthFactor: 0.45,
+                                    child: TextField(
+                                      controller: counterController,
+                                      keyboardType: TextInputType.number,
+                                      decoration: InputDecoration(labelText: S.of(context).oathCounter, errorText: counterErrorText),
+                                      style: TextStyle(fontSize: 19),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                          if (type == Type.totp)
+                            Container(
+                              padding: EdgeInsets.only(left: 15.0, right: 15.0, bottom: 20.0),
+                              child: CheckboxListTile(
+                                value: requireTouch,
+                                onChanged: (e) => {requireTouch = e},
+                                title: Text(S.of(context).oathRequireTouch),
+                              ),
+                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: <Widget>[
+                              InkWell(
+                                onTap: () => Navigator.pop(context),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  padding: EdgeInsets.all(10.0),
+                                  child: Text(S.of(context).cancel, style: TextStyle(fontWeight: FontWeight.bold)),
+                                ),
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  String account = '', secretKey = '', period = '', counter = '';
+                                  if (accountController.text.isEmpty) account = S.of(context).oathRequired;
+                                  if (accountController.text.length + issuerController.text.length > 63) account = S.of(context).oathTooLong;
+                                  if (secretKeyController.text.isEmpty) secretKey = S.of(context).oathRequired;
+                                  if (secretKeyController.text.length > 52) secretKey = S.of(context).oathTooLong;
+                                  String secretHex;
+                                  try {
+                                    secretHex = base32.decodeAsHexString(secretKeyController.text);
+                                  } catch (e) {
+                                    secretKey = S.of(context).oathInvalidKey;
+                                  }
+                                  if (type == Type.totp && periodController.text.isEmpty) period = S.of(context).oathRequired;
+                                  if (type == Type.hotp && counterController.text.isEmpty) counter = S.of(context).oathRequired;
+                                  if (type == Type.totp && int.tryParse(periodController.text) == null)
+                                    period = S.of(context).oathCounterMustBeNumber;
+                                  if (type == Type.hotp && int.tryParse(counterController.text) == null)
+                                    counter = S.of(context).oathCounterMustBeNumber;
+
+                                  setState(() {
+                                    accountErrorText = account.isEmpty ? null : account;
+                                    secretKeyErrorText = secretKey.isEmpty ? null : secretKey;
+                                    periodErrorText = period.isEmpty ? null : period;
+                                    counterErrorText = counter.isEmpty ? null : counter;
+                                  });
+
+                                  if (account.isEmpty && secretKey.isEmpty && period.isEmpty && counter.isEmpty) {
+                                    String name = accountController.text;
+                                    if (issuerController.text.isNotEmpty) name = issuerController.text + ':' + name;
+                                    addAccount(name, secretHex, type, algo, digits, int.parse(periodController.text),
+                                        int.parse(counterController.text), requireTouch);
+                                  }
+                                },
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  padding: EdgeInsets.all(10.0),
+                                  decoration: BoxDecoration(),
+                                  child: Text(S.of(context).confirm, style: TextStyle(color: Colors.indigo[500], fontWeight: FontWeight.bold)),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ))));
   }
 
   void showDeleteDialog(String name) {
@@ -231,7 +447,35 @@ class _OATHState extends State<OATH> {
     });
   }
 
-  Future<String> calculate(String name, bool isHotp) async {
+  void addAccount(String name, String key, Type type, Algorithm algo, int digits, int period, int initValue, bool requireTouch) {
+    Commons.process(context, () async {
+      String resp = await transceive('00A4040007A0000005272101');
+      Commons.assertOK(resp);
+
+      Uint8List nameBytes = utf8.encode(name);
+      String capduData = '71' + nameBytes.length.toRadixString(16).padLeft(2, '0') + hex.encode(nameBytes); // name 0x71
+      capduData += '73' +
+          (key.length ~/ 2 + 2).toRadixString(16).padLeft(2, '0') + // length
+          (type.toValue() | algo.toValue()).toRadixString(16).padLeft(2, '0') + // type & algo
+          digits.toRadixString(16).padLeft(2, '0') + // digits
+          key;
+      if (requireTouch) capduData += '780102';
+      if (initValue > 0) capduData += '7A04' + initValue.toRadixString(16).padLeft(4, '0');
+
+      resp = await transceive('00010000' + (capduData.length ~/ 2).toRadixString(16).padLeft(2, '0') + capduData);
+      Commons.assertOK(resp);
+      issuerController.text = '';
+      accountController.text = '';
+      secretKeyController.text = '';
+      periodController.text = '30';
+      counterController.text = '0';
+      Flushbar(backgroundColor: Colors.green, message: S.of(context).oathAdded, duration: Duration(seconds: 3)).show(context);
+      Navigator.pop(context);
+      refresh();
+    });
+  }
+
+  Future<String> calculate(String name, Type type) async {
     String code;
     await Commons.process(context, () async {
       String resp = await transceive('00A4040007A0000005272101');
@@ -243,7 +487,7 @@ class _OATHState extends State<OATH> {
       }
       Uint8List nameBytes = utf8.encode(name);
       String capduData = '71' + nameBytes.length.toRadixString(16).padLeft(2, '0') + hex.encode(nameBytes);
-      if (!isHotp) {
+      if (type == Type.totp) {
         int challenge = DateTime.now().millisecondsSinceEpoch ~/ 30000;
         String challengeStr = challenge.toRadixString(16).padLeft(16, '0');
         capduData += '7408$challengeStr';
@@ -268,6 +512,7 @@ class _OATHState extends State<OATH> {
       Uint8List nameBytes = utf8.encode(name);
       String capduData = '71' + nameBytes.length.toRadixString(16).padLeft(2, '0') + hex.encode(nameBytes);
       Commons.assertOK(await transceive('00020000' + (capduData.length ~/ 2).toRadixString(16).padLeft(2, '0') + capduData));
+      Flushbar(backgroundColor: Colors.green, message: S.of(context).oathDeleted, duration: Duration(seconds: 3)).show(context);
       Navigator.pop(context);
       refresh();
     });
@@ -311,7 +556,7 @@ class _OATHState extends State<OATH> {
         item.code = parseResponse(data.sublist(4 + nameLen, 4 + nameLen + dataLen));
         break;
       case 0x77: // hotp
-        item.isHotp = true;
+        item.type = Type.hotp;
         break;
       case 0x7C: // touch
         item.requireTouch = true;
@@ -352,9 +597,41 @@ class _OATHState extends State<OATH> {
 
 enum Version { legacy, v1 }
 
+enum Type { hotp, totp }
+
+extension TypeEx on Type {
+  int toValue() {
+    switch (this) {
+      case Type.hotp:
+        return 0x10;
+      case Type.totp:
+        return 0x20;
+      default:
+        return 0;
+    }
+  }
+}
+
+enum Algorithm { sha1, sha256, sha512 }
+
+extension AlgorithmEx on Algorithm {
+  int toValue() {
+    switch (this) {
+      case Algorithm.sha1:
+        return 0x01;
+      case Algorithm.sha256:
+        return 0x02;
+      case Algorithm.sha512:
+        return 0x03;
+      default:
+        return 0;
+    }
+  }
+}
+
 class OathItem {
   String name;
-  bool isHotp = false;
+  Type type = Type.totp;
   bool requireTouch = false;
   String code = '';
   int _length = 0;

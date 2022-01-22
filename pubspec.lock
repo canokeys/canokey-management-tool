@@ -36,6 +36,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.2.0"
+  base32:
+    dependency: "direct main"
+    description:
+      name: base32
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.1"
   basic_utils:
     dependency: "direct main"
     description:
@@ -198,7 +205,7 @@ packages:
     description:
       path: "."
       ref: webusb_support
-      resolved-ref: bdfe25216c4234b6dfb84d11d16cff58303a2c76
+      resolved-ref: "55d3da900287aa20b947bb60e46f255d1fe6f2af"
       url: "https://github.com/nfcim/flutter_nfc_kit.git"
     source: git
     version: "3.2.0"
@@ -531,14 +538,14 @@ packages:
       name: url_launcher_linux
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.2"
+    version: "2.0.3"
   url_launcher_macos:
     dependency: transitive
     description:
       name: url_launcher_macos
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.2"
+    version: "2.0.3"
   url_launcher_platform_interface:
     dependency: transitive
     description:
@@ -580,7 +587,7 @@ packages:
       name: win32
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.3.6"
+    version: "2.3.8"
   xdg_directories:
     dependency: transitive
     description:
@@ -589,5 +596,5 @@ packages:
     source: hosted
     version: "0.2.0"
 sdks:
-  dart: ">=2.14.0 <3.0.0"
+  dart: ">=2.15.0 <3.0.0"
   flutter: ">=2.5.0"

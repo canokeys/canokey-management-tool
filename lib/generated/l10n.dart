@@ -315,6 +315,26 @@ class S {
     );
   }
 
+  /// `Add`
+  String get add {
+    return Intl.message(
+      'Add',
+      name: 'add',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reset`
+  String get reset {
+    return Intl.message(
+      'Reset',
+      name: 'reset',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Card Info`
   String get openpgpCardInfo {
     return Intl.message(
@@ -555,16 +575,6 @@ class S {
     );
   }
 
-  /// `Reset`
-  String get settingsReset {
-    return Intl.message(
-      'Reset',
-      name: 'settingsReset',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Model`
   String get settingsModel {
     return Intl.message(
@@ -762,6 +772,186 @@ class S {
       name: 'oathDelete',
       desc: '',
       args: [name],
+    );
+  }
+
+  /// `Copy to Clipboard`
+  String get oathCopy {
+    return Intl.message(
+      'Copy to Clipboard',
+      name: 'oathCopy',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Set as Default`
+  String get oathSetDefault {
+    return Intl.message(
+      'Set as Default',
+      name: 'oathSetDefault',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add Account`
+  String get oathAddAccount {
+    return Intl.message(
+      'Add Account',
+      name: 'oathAddAccount',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Issuer`
+  String get oathIssuer {
+    return Intl.message(
+      'Issuer',
+      name: 'oathIssuer',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Account name`
+  String get oathAccount {
+    return Intl.message(
+      'Account name',
+      name: 'oathAccount',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Secret key`
+  String get oathSecret {
+    return Intl.message(
+      'Secret key',
+      name: 'oathSecret',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Type`
+  String get oathType {
+    return Intl.message(
+      'Type',
+      name: 'oathType',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Algorithm`
+  String get oathAlgorithm {
+    return Intl.message(
+      'Algorithm',
+      name: 'oathAlgorithm',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Digits`
+  String get oathDigits {
+    return Intl.message(
+      'Digits',
+      name: 'oathDigits',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Period`
+  String get oathPeriod {
+    return Intl.message(
+      'Period',
+      name: 'oathPeriod',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Require Touch`
+  String get oathRequireTouch {
+    return Intl.message(
+      'Require Touch',
+      name: 'oathRequireTouch',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Required`
+  String get oathRequired {
+    return Intl.message(
+      'Required',
+      name: 'oathRequired',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Too long`
+  String get oathTooLong {
+    return Intl.message(
+      'Too long',
+      name: 'oathTooLong',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Counter`
+  String get oathCounter {
+    return Intl.message(
+      'Counter',
+      name: 'oathCounter',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Not a number`
+  String get oathCounterMustBeNumber {
+    return Intl.message(
+      'Not a number',
+      name: 'oathCounterMustBeNumber',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Invalid secret key`
+  String get oathInvalidKey {
+    return Intl.message(
+      'Invalid secret key',
+      name: 'oathInvalidKey',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Successfully deleted`
+  String get oathDeleted {
+    return Intl.message(
+      'Successfully deleted',
+      name: 'oathDeleted',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Successfully added`
+  String get oathAdded {
+    return Intl.message(
+      'Successfully added',
+      name: 'oathAdded',
+      desc: '',
+      args: [],
     );
   }
 }
