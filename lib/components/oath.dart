@@ -2,12 +2,14 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:another_flushbar/flushbar.dart';
+import 'package:base32/base32.dart';
+import 'package:circular_countdown/circular_countdown.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:logging/logging.dart';
-import 'package:base32/base32.dart';
+import 'package:timer_controller/timer_controller.dart';
 
 import '../drawer.dart';
 import '../generated/l10n.dart';
@@ -27,6 +29,7 @@ class _OATHState extends State<OATH> {
   bool polled = false;
   List<OathItem> items = [];
   Version version;
+  TimerController timerController = TimerController.seconds(30);
   TextEditingController issuerController = TextEditingController();
   TextEditingController accountController = TextEditingController();
   TextEditingController secretKeyController = TextEditingController();
@@ -73,13 +76,19 @@ class _OATHState extends State<OATH> {
               ),
               SizedBox(height: 25.0),
             ] else ...[
-              ListView.builder(
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-                itemCount: items.length,
-                itemBuilder: (context, index) =>
-                    itemTile(width, Icons.pin, items[index].code, items[index].name, items[index].requireTouch, items[index].type),
-              ),
+              TimerControllerListener(
+                  controller: timerController,
+                  listener: (_, TimerValue value) {
+                    print(value.remaining);
+                    if (value.status == TimerStatus.finished) refresh();
+                  },
+                  child: ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    itemCount: items.length,
+                    itemBuilder: (context, index) =>
+                        itemTile(width, Icons.pin, items[index].code, items[index].name, items[index].requireTouch, items[index].type),
+                  )),
             ]
           ],
         ),
@@ -93,6 +102,7 @@ class _OATHState extends State<OATH> {
     accountController.dispose();
     secretKeyController.dispose();
     periodController.dispose();
+    timerController.dispose();
     super.dispose();
   }
 
@@ -171,6 +181,18 @@ class _OATHState extends State<OATH> {
                   },
                   icon: Icon(Icons.more_horiz, size: 28.0, color: Colors.indigo[500]),
                 ),
+                if (type == Type.totp && code.isNotEmpty)
+                  TimerControllerBuilder(
+                      controller: timerController,
+                      builder: (_, TimerValue value, __) => CircularCountdown(
+                            diameter: 28,
+                            strokeWidth: 8,
+                            countdownTotal: 30,
+                            countdownRemaining: value.remaining,
+                            countdownRemainingColor: const Color(0xFF4F6367),
+                            countdownTotalColor: Colors.transparent,
+                            countdownCurrentColor: Colors.green,
+                          )),
               ],
             ),
           ),
@@ -442,6 +464,9 @@ class _OATHState extends State<OATH> {
         setState(() {
           polled = true;
           items = parseV1(data);
+          int running = DateTime.now().millisecondsSinceEpoch ~/ 1000 % 30;
+          timerController.value = new TimerValue(remaining: 30 - running, unit: TimerUnit.second);
+          timerController.start();
         });
       }
     });

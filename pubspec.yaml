@@ -40,6 +40,8 @@ dependencies:
   flutter_web_frame: ^0.0.2
   another_flushbar: ^1.10.28
   base32: 2.1.1
+  circular_countdown: ^2.1.0
+  timer_controller: ^0.1.0
   flutter_nfc_kit:
     git:
       url: https://github.com/nfcim/flutter_nfc_kit.git

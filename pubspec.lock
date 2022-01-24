@@ -113,6 +113,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.10.0"
+  circular_countdown:
+    dependency: "direct main"
+    description:
+      name: circular_countdown
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.0"
   clock:
     dependency: transitive
     description:
@@ -261,6 +268,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.0"
+  freezed_annotation:
+    dependency: transitive
+    description:
+      name: freezed_annotation
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.14.3"
   http:
     dependency: transitive
     description:
@@ -497,6 +511,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.4.3"
+  timer_controller:
+    dependency: "direct main"
+    description:
+      name: timer_controller
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.0"
   transparent_image:
     dependency: "direct main"
     description:
