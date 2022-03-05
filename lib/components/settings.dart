@@ -1,4 +1,3 @@
-import 'package:another_flushbar/flushbar.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
@@ -947,7 +946,7 @@ class _SettingsState extends State<Settings> {
       if (!await verifyPin(oldPin)) return;
       Navigator.pop(context);
       Commons.assertOK(await FlutterNfcKit.transceive('00210000' + newPin.length.toRadixString(16).padLeft(2, '0') + hex.encode(newPin.codeUnits)));
-      Flushbar(backgroundColor: Colors.green, message: S.of(context).pinChanged, duration: Duration(seconds: 3)).show(context);
+      Commons.promptSuccess(S.of(context).pinChanged);
       pin = null;
     });
   }
@@ -958,7 +957,7 @@ class _SettingsState extends State<Settings> {
       if (!await verifyPin(pin)) return;
       Navigator.pop(context);
       Commons.assertOK(await FlutterNfcKit.transceive('000903' + cacheTime.toRadixString(16).padLeft(2, '0')));
-      Flushbar(backgroundColor: Colors.green, message: S.of(context).openpgpUifCacheTimeChanged, duration: Duration(seconds: 3)).show(context);
+      Commons.promptSuccess(S.of(context).openpgpUifCacheTimeChanged);
       refresh(pin);
     });
   }
@@ -976,7 +975,7 @@ class _SettingsState extends State<Settings> {
       if (!await verifyPin(pin)) return;
       Navigator.pop(context);
       Commons.assertOK(await FlutterNfcKit.transceive(changeSwitchAPDUs[function][newStatus]));
-      Flushbar(backgroundColor: Colors.green, message: S.of(context).successfullyChanged, duration: Duration(seconds: 3)).show(context);
+      Commons.promptSuccess(S.of(context).successfullyChanged);
       refresh(pin);
     });
   }
@@ -987,7 +986,7 @@ class _SettingsState extends State<Settings> {
       if (!await verifyPin(pin)) return;
       Navigator.pop(context);
       Commons.assertOK(await FlutterNfcKit.transceive(resetAppletAPDUs[applet]));
-      Flushbar(backgroundColor: Colors.green, message: S.of(context).settingsResetSuccess, duration: Duration(seconds: 3)).show(context);
+      Commons.promptSuccess(S.of(context).settingsResetSuccess);
       refresh(pin);
     });
   }
@@ -999,14 +998,13 @@ class _SettingsState extends State<Settings> {
       String resp = await FlutterNfcKit.transceive('00500000055245534554');
       if (resp == '9000') {
         Navigator.pop(context);
-        Flushbar(backgroundColor: Colors.green, message: S.of(context).settingsResetSuccess, duration: Duration(seconds: 3)).show(context);
+        Commons.promptSuccess(S.of(context).settingsResetSuccess);
       } else if (resp == '6985') {
-        Flushbar(backgroundColor: Colors.red, message: S.of(context).settingsResetConditionNotSatisfying, duration: Duration(seconds: 3))
-            .show(context);
+        Commons.promptFailure(S.of(context).settingsResetConditionNotSatisfying);
       } else if (resp == '6982') {
-        Flushbar(backgroundColor: Colors.red, message: S.of(context).settingsResetPresenceTestFailed, duration: Duration(seconds: 3)).show(context);
+        Commons.promptFailure(S.of(context).settingsResetPresenceTestFailed);
       } else {
-        Flushbar(backgroundColor: Colors.red, message: 'Unknown error', duration: Duration(seconds: 3)).show(context);
+        Commons.promptFailure('Unknown error');
       }
     });
   }

@@ -1,7 +1,7 @@
-import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../generated/l10n.dart';
 
@@ -26,11 +26,11 @@ class Commons {
       await f();
     } on PlatformException catch (e) {
       if (e.message == 'NotFoundError: No device selected.') {
-        Flushbar(backgroundColor: Colors.red, message: S.of(context).pollCanceled, duration: Duration(seconds: 3)).show(context);
+        promptFailure(S.of(context).pollCanceled);
       } else if (e.message == 'NetworkError: A transfer error has occurred.') {
-        Flushbar(backgroundColor: Colors.red, message: S.of(context).networkError, duration: Duration(seconds: 3)).show(context);
+        promptFailure(S.of(context).networkError);
       } else {
-        Flushbar(backgroundColor: Colors.red, message: e.message, duration: Duration(seconds: 3)).show(context);
+        promptFailure(e.message);
       }
     } finally {
       FlutterNfcKit.finish(closeWebUSB: false);
@@ -39,16 +39,42 @@ class Commons {
 
   static void promptPinFailureResult(BuildContext context, String resp) {
     if (resp == '6983') {
-      Flushbar(backgroundColor: Colors.red, message: S.of(context).appletLocked, duration: Duration(seconds: 3)).show(context);
+      promptFailure(S.of(context).appletLocked);
     } else if (resp == '6982') {
-      Flushbar(backgroundColor: Colors.red, message: S.of(context).pinIncorrect, duration: Duration(seconds: 3)).show(context);
+      promptFailure(S.of(context).pinIncorrect);
     } else if (resp.toUpperCase().startsWith('63C')) {
       String retries = resp[resp.length - 1];
-      Flushbar(backgroundColor: Colors.red, message: S.of(context).pinRetries(retries), duration: Duration(seconds: 3)).show(context);
+      promptFailure(S.of(context).pinRetries(retries));
     } else if (resp == '6700') {
-      Flushbar(backgroundColor: Colors.red, message: S.of(context).pinLength, duration: Duration(seconds: 3)).show(context);
+      promptFailure(S.of(context).pinLength);
     } else {
-      Flushbar(backgroundColor: Colors.red, message: 'Unknown response', duration: Duration(seconds: 3)).show(context);
+      promptFailure('Unknown response');
     }
+  }
+
+  static void promptSuccess(String content) {
+    Fluttertoast.showToast(
+        msg: content,
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+        webPosition: 'center',
+        webBgColor: '#4CAF50');
+  }
+
+  static void promptFailure(String content) {
+    Fluttertoast.showToast(
+        msg: content,
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+        webPosition: 'center',
+        webBgColor: '#F44336');
   }
 }

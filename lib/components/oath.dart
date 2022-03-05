@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:another_flushbar/flushbar.dart';
 import 'package:base32/base32.dart';
 import 'package:circular_countdown/circular_countdown.dart';
 import 'package:convert/convert.dart';
@@ -79,7 +78,6 @@ class _OATHState extends State<OATH> {
               TimerControllerListener(
                   controller: timerController,
                   listener: (_, TimerValue value) {
-                    print(value.remaining);
                     if (value.status == TimerStatus.finished) refresh();
                   },
                   child: ListView.builder(
@@ -494,7 +492,7 @@ class _OATHState extends State<OATH> {
       secretKeyController.text = '';
       periodController.text = '30';
       counterController.text = '0';
-      Flushbar(backgroundColor: Colors.green, message: S.of(context).oathAdded, duration: Duration(seconds: 3)).show(context);
+      Commons.promptSuccess(S.of(context).oathAdded);
       Navigator.pop(context);
       refresh();
     });
@@ -537,7 +535,7 @@ class _OATHState extends State<OATH> {
       Uint8List nameBytes = utf8.encode(name);
       String capduData = '71' + nameBytes.length.toRadixString(16).padLeft(2, '0') + hex.encode(nameBytes);
       Commons.assertOK(await transceive('00020000' + (capduData.length ~/ 2).toRadixString(16).padLeft(2, '0') + capduData));
-      Flushbar(backgroundColor: Colors.green, message: S.of(context).oathDeleted, duration: Duration(seconds: 3)).show(context);
+      Commons.promptSuccess(S.of(context).oathDeleted);
       Navigator.pop(context);
       refresh();
     });
@@ -550,7 +548,7 @@ class _OATHState extends State<OATH> {
       Uint8List nameBytes = utf8.encode(name);
       String capduData = '71' + nameBytes.length.toRadixString(16).padLeft(2, '0') + hex.encode(nameBytes);
       Commons.assertOK(await transceive('00550000' + (capduData.length ~/ 2).toRadixString(16).padLeft(2, '0') + capduData));
-      Flushbar(backgroundColor: Colors.green, message: S.of(context).successfullyChanged, duration: Duration(seconds: 3)).show(context);
+      Commons.promptSuccess(S.of(context).successfullyChanged);
       refresh();
     });
   }

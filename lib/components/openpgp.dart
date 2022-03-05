@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:another_flushbar/flushbar.dart';
 import 'package:basic_utils/basic_utils.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
@@ -593,7 +592,7 @@ class _OpenPGPState extends State<OpenPGP> {
           hex.encode(newPin.codeUnits));
       if (resp == '9000') {
         Navigator.pop(context);
-        Flushbar(backgroundColor: Colors.green, message: S.of(context).pinChanged, duration: Duration(seconds: 3)).show(context);
+        Commons.promptSuccess(S.of(context).pinChanged);
       } else {
         Commons.promptPinFailureResult(context, resp);
       }
@@ -607,7 +606,7 @@ class _OpenPGPState extends State<OpenPGP> {
       Commons.assertOK(
           await transceive('00DA00' + getKeyUifTag(keyType) + '02' + newPolicy.toValue().toRadixString(16).padLeft(2, '0') + '20'));
       Navigator.pop(context);
-      Flushbar(backgroundColor: Colors.green, message: S.of(context).openpgpUifChanged, duration: Duration(seconds: 3)).show(context);
+      Commons.promptSuccess(S.of(context).openpgpUifChanged);
       refresh();
     });
   }
@@ -618,7 +617,7 @@ class _OpenPGPState extends State<OpenPGP> {
       if (!await verifyAdminPin(adminPin)) return;
       Commons.assertOK(await transceive('00DA010201' + cacheTime.toRadixString(16).padLeft(2, '0')));
       Navigator.pop(context);
-      Flushbar(backgroundColor: Colors.green, message: S.of(context).openpgpUifCacheTimeChanged, duration: Duration(seconds: 3)).show(context);
+      Commons.promptSuccess(S.of(context).openpgpUifCacheTimeChanged);
       refresh();
     });
   }
