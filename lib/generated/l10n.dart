@@ -765,6 +765,16 @@ class S {
     );
   }
 
+  /// `Change Language`
+  String get settingsChangeLanguage {
+    return Intl.message(
+      'Change Language',
+      name: 'settingsChangeLanguage',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `This action will delete the account {name} from your CanoKey. Make sure 2FA has been disabled on the web service.`
   String oathDelete(Object name) {
     return Intl.message(
@@ -950,6 +960,26 @@ class S {
     return Intl.message(
       'Successfully added',
       name: 'oathAdded',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unlock CanoKey`
+  String get oathInputCode {
+    return Intl.message(
+      'Unlock CanoKey',
+      name: 'oathInputCode',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `To prevent unauthorized access, this CanoKey is protected with a password.`
+  String get oathInputCodePrompt {
+    return Intl.message(
+      'To prevent unauthorized access, this CanoKey is protected with a password.',
+      name: 'oathInputCodePrompt',
       desc: '',
       args: [],
     );

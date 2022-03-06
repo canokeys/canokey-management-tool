@@ -26,6 +26,7 @@ dependencies:
   base32: 2.1.1
   circular_countdown: ^2.1.0
   timer_controller: ^0.1.0
+  cryptography: ^2.0.5
   flutter_nfc_kit:
     git:
       url: https://github.com/nfcim/flutter_nfc_kit.git

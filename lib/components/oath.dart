@@ -14,6 +14,7 @@ import '../drawer.dart';
 import '../generated/l10n.dart';
 import '../utils/NumericalRangeFormatter.dart';
 import '../utils/commons.dart';
+import '../utils/tlv.dart';
 
 final log = Logger('ManagementTool:OATH');
 
@@ -34,6 +35,7 @@ class _OATHState extends State<OATH> {
   TextEditingController secretKeyController = TextEditingController();
   TextEditingController periodController = TextEditingController(text: '30');
   TextEditingController counterController = TextEditingController(text: '0');
+  TextEditingController codeController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -101,6 +103,7 @@ class _OATHState extends State<OATH> {
     secretKeyController.dispose();
     periodController.dispose();
     timerController.dispose();
+    codeController.dispose();
     super.dispose();
   }
 
@@ -445,14 +448,97 @@ class _OATHState extends State<OATH> {
     );
   }
 
+  void showInputCodeDialog() {
+    bool tapCode = true;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) {
+        return Dialog(
+          elevation: 0.0,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+          child: Wrap(
+            children: [
+              Container(
+                padding: EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Text(S.of(context).oathInputCode, style: TextStyle(fontWeight: FontWeight.bold)),
+                    Divider(color: Colors.black),
+                    SizedBox(height: 10.0),
+                    Text(S.of(context).oathInputCodePrompt),
+                    SizedBox(height: 10.0),
+                    Container(
+                      padding: EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0),
+                      child: TextField(
+                        controller: codeController,
+                        obscureText: tapCode,
+                        autofocus: true,
+                        decoration: InputDecoration(
+                          labelText: S.of(context).oldPin,
+                          hintText: S.of(context).oldPin,
+                          border: InputBorder.none,
+                          prefixIcon: Icon(Icons.lock_outlined, color: Colors.indigo[500]),
+                          suffixIcon: IconButton(
+                            onPressed: () => setState(() => tapCode = !tapCode),
+                            icon: tapCode
+                                ? Icon(Icons.remove_red_eye_outlined, color: Colors.indigo[500])
+                                : Icon(Icons.visibility_off_outlined, color: Colors.indigo[500]),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 10.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        InkWell(
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            alignment: Alignment.center,
+                            padding: EdgeInsets.all(10.0),
+                            child: Text(S.of(context).cancel, style: TextStyle(fontWeight: FontWeight.bold)),
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () => {},
+                          child: Container(
+                            alignment: Alignment.center,
+                            padding: EdgeInsets.all(10.0),
+                            decoration: BoxDecoration(),
+                            child: Text(S.of(context).reset, style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void refresh() {
     Commons.process(context, () async {
       String resp = await transceive('00A4040007A0000005272101');
       Commons.assertOK(resp);
       if (resp == '9000') {
         version = Version.legacy;
-      } else if (resp.substring(4, 10) == '050505') {
-        version = Version.v1;
+      } else {
+        Map info = TLV.parse(hex.decode(Commons.dropSW(resp)));
+        print(info);
+        if (hex.encode(info[0x79]) == '050505') {
+          version = Version.v1;
+          if (info.containsKey(0x74)) {
+            showInputCodeDialog();
+            return;
+          }
+        }
       }
       int challenge = DateTime.now().millisecondsSinceEpoch ~/ 30000;
       String challengeStr = challenge.toRadixString(16).padLeft(16, '0');

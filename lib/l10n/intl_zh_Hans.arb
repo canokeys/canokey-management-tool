@@ -74,6 +74,7 @@
   "settingsResetSuccess": "重置成功",
   "settingsResetConditionNotSatisfying": "PIN 尚未锁定",
   "settingsResetPresenceTestFailed": "请按提示触摸",
+  "settingsChangeLanguage": "修改语言",
 
   "oathDelete": "您正在删除{name}，删除该项目后无法恢复！请确认相关服务的二步验证已经关闭。",
   "oathCopy": "复制",
@@ -93,5 +94,7 @@
   "oathCounterMustBeNumber": "请填写数字",
   "oathInvalidKey": "密钥无效",
   "oathDeleted": "删除成功",
-  "oathAdded": "添加成功"
+  "oathAdded": "添加成功",
+  "oathInputCode": "解锁 CanoKey",
+  "oathInputCodePrompt": "该 CanoKey 受口令保护，请输入口令。"
 }

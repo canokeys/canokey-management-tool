@@ -74,6 +74,7 @@
   "settingsResetSuccess": "Successfully reset",
   "settingsResetConditionNotSatisfying": "PIN has not been locked yet",
   "settingsResetPresenceTestFailed": "You did not touch the pad in time",
+  "settingsChangeLanguage": "Change Language",
 
   "oathDelete": "This action will delete the account {name} from your CanoKey. Make sure 2FA has been disabled on the web service.",
   "oathCopy": "Copy to Clipboard",
@@ -93,5 +94,7 @@
   "oathCounterMustBeNumber": "Not a number",
   "oathInvalidKey": "Invalid secret key",
   "oathDeleted": "Successfully deleted",
-  "oathAdded": "Successfully added"
+  "oathAdded": "Successfully added",
+  "oathInputCode": "Unlock CanoKey",
+  "oathInputCodePrompt": "To prevent unauthorized access, this CanoKey is protected with a password."
 }
