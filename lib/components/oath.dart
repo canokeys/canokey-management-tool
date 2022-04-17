@@ -53,13 +53,13 @@ class _OATHState extends State<OATH> {
           PopupMenuButton(
             itemBuilder: (BuildContext context) => [
               PopupMenuItem(value: 0, child: Text(S.of(context).add)),
-              PopupMenuItem(value: 1, child: Text(S.of(context).oathSetCode)),
+              if (version == Version.v1) PopupMenuItem(value: 1, child: Text(S.of(context).oathSetCode)),
             ],
             onSelected: (idx) async {
               if (idx == 0) {
                 showAddDialog();
               } else if (idx == 1) {
-                showSetCodeDialog();
+                if (version == Version.v1) showSetCodeDialog();
               }
             },
             icon: Icon(Icons.more_vert),
@@ -635,15 +635,18 @@ class _OATHState extends State<OATH> {
       String challengeStr = challenge.toRadixString(16).padLeft(16, '0');
       if (version == Version.v1) {
         resp = await transceive('00A400010A7408$challengeStr');
-        Uint8List data = hex.decode(Commons.dropSW(resp));
-        setState(() {
-          polled = true;
-          items = parseV1(data);
-          int running = DateTime.now().millisecondsSinceEpoch ~/ 1000 % 30;
-          timerController.value = new TimerValue(remaining: 30 - running, unit: TimerUnit.second);
-          timerController.start();
-        });
+      } else {
+        resp = await transceive('000500000A7408$challengeStr');
       }
+      Commons.assertOK(resp);
+      Uint8List data = hex.decode(Commons.dropSW(resp));
+      setState(() {
+        polled = true;
+        items = parseV1(data);
+        int running = DateTime.now().millisecondsSinceEpoch ~/ 1000 % 30;
+        timerController.value = new TimerValue(remaining: 30 - running, unit: TimerUnit.second);
+        timerController.start();
+      });
     });
   }
 
@@ -680,11 +683,6 @@ class _OATHState extends State<OATH> {
     await Commons.process(context, () async {
       String resp = await transceive('00A4040007A0000005272101');
       Commons.assertOK(resp);
-      if (resp == '9000') {
-        version = Version.legacy;
-      } else if (resp.substring(4, 10) == '050505') {
-        version = Version.v1;
-      }
       Uint8List nameBytes = utf8.encode(name);
       String capduData = '71' + nameBytes.length.toRadixString(16).padLeft(2, '0') + hex.encode(nameBytes);
       if (type == Type.totp) {
@@ -694,13 +692,15 @@ class _OATHState extends State<OATH> {
       }
       if (version == Version.v1) {
         resp = await transceive('00A20001' + (capduData.length ~/ 2).toRadixString(16).padLeft(2, '0') + capduData);
-        Commons.assertOK(resp);
-        Uint8List data = hex.decode(Commons.dropSW(resp));
-        code = parseResponse(data.sublist(2));
-        setState(() {
-          items.firstWhere((e) => e.name == name).code = code;
-        });
+      } else {
+        resp = await transceive('00040000' + (capduData.length ~/ 2).toRadixString(16).padLeft(2, '0') + capduData);
       }
+      Commons.assertOK(resp);
+      Uint8List data = hex.decode(Commons.dropSW(resp));
+      code = parseResponse(data.sublist(2));
+      setState(() {
+        items.firstWhere((e) => e.name == name).code = code;
+      });
     });
     return code;
   }
