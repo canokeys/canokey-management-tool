@@ -3,6 +3,7 @@ import 'package:navigation_history_observer/navigation_history_observer.dart';
 
 import 'components/oath.dart';
 import 'components/openpgp.dart';
+import 'components/piv.dart';
 import 'components/settings.dart';
 import 'generated/l10n.dart';
 import 'home.dart';
@@ -26,7 +27,7 @@ class AppDrawer extends StatelessWidget {
             trailing: Icon(Icons.arrow_forward_ios, size: 15.0, color: Colors.black),
           ),
           ListTile(
-            onTap: () {},
+            onTap: () => doRoute(context, PIV.routeName),
             leading: Icon(Icons.credit_card, color: Colors.black),
             title: Text('PIV', style: TextStyle(color: Colors.black)),
             trailing: Icon(Icons.arrow_forward_ios, size: 15.0, color: Colors.black),
@@ -37,12 +38,12 @@ class AppDrawer extends StatelessWidget {
             title: Text('TOTP / HOTP', style: TextStyle(color: Colors.black)),
             trailing: Icon(Icons.arrow_forward_ios, size: 15.0, color: Colors.black),
           ),
-          ListTile(
-            onTap: () {},
-            leading: Icon(Icons.web, color: Colors.black),
-            title: Text('WebAuthn', style: TextStyle(color: Colors.black)),
-            trailing: Icon(Icons.arrow_forward_ios, size: 15.0, color: Colors.black),
-          ),
+          // ListTile(
+          //   onTap: () {},
+          //   leading: Icon(Icons.web, color: Colors.black),
+          //   title: Text('WebAuthn', style: TextStyle(color: Colors.black)),
+          //   trailing: Icon(Icons.arrow_forward_ios, size: 15.0, color: Colors.black),
+          // ),
           ListTile(
             onTap: () => doRoute(context, Settings.routeName),
             leading: Icon(Icons.settings, color: Colors.black),

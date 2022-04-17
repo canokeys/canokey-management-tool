@@ -19,7 +19,7 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'en';
 
-  static m0(min) => "New PIN should be at least ${min} characters long. The maximum length is 64.";
+  static m0(min, max) => "New PIN should be at least ${min} characters long. The maximum length is ${max}.";
 
   static m1(name) => "This action will delete the account ${name} from your CanoKey. Make sure 2FA has been disabled on the web service.";
 
@@ -100,6 +100,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "pinInvalidLength" : MessageLookupByLibrary.simpleMessage("Invalid length"),
     "pinLength" : MessageLookupByLibrary.simpleMessage("The provided PIN is too short or too long."),
     "pinRetries" : m3,
+    "pivChangePUK" : MessageLookupByLibrary.simpleMessage("Change PUK"),
     "pollCanceled" : MessageLookupByLibrary.simpleMessage("No CanoKey is selected."),
     "pollCanoKey" : MessageLookupByLibrary.simpleMessage("Please read your CanoKey by clicking the refresh button"),
     "reset" : MessageLookupByLibrary.simpleMessage("Reset"),

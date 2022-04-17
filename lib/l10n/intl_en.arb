@@ -22,7 +22,7 @@
   "off": "Off",
   "successfullyChanged": "Successfully changed",
   "changePin": "Change PIN",
-  "changePinPrompt": "New PIN should be at least {min} characters long. The maximum length is 64.",
+  "changePinPrompt": "New PIN should be at least {min} characters long. The maximum length is {max}.",
   "pinChanged": "PIN has been successfully changed.",
   "pinInvalidLength": "Invalid length",
   "warning": "Warning",
@@ -101,5 +101,7 @@
   "oathSetCode": "Set Passphrase",
   "oathNewCode": "New Passphrase",
   "oathCodeChanged": "Passphrase Changed",
-  "oathNewCodePrompt": "Enter a new passphrase. Leave it empty to disable current passphrase."
+  "oathNewCodePrompt": "Enter a new passphrase. Leave it empty to disable current passphrase.",
+
+  "pivChangePUK": "Change PUK"
 }

@@ -265,13 +265,13 @@ class S {
     );
   }
 
-  /// `New PIN should be at least {min} characters long. The maximum length is 64.`
-  String changePinPrompt(Object min) {
+  /// `New PIN should be at least {min} characters long. The maximum length is {max}.`
+  String changePinPrompt(Object min, Object max) {
     return Intl.message(
-      'New PIN should be at least $min characters long. The maximum length is 64.',
+      'New PIN should be at least $min characters long. The maximum length is $max.',
       name: 'changePinPrompt',
       desc: '',
-      args: [min],
+      args: [min, max],
     );
   }
 
@@ -1030,6 +1030,16 @@ class S {
     return Intl.message(
       'Enter a new passphrase. Leave it empty to disable current passphrase.',
       name: 'oathNewCodePrompt',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Change PUK`
+  String get pivChangePUK {
+    return Intl.message(
+      'Change PUK',
+      name: 'pivChangePUK',
       desc: '',
       args: [],
     );

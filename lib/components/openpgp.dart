@@ -261,7 +261,10 @@ class _OpenPGPState extends State<OpenPGP> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       InkWell(
-                        onTap: () => changeUif(keyType, currentPolicy, pinController.text),
+                        onTap: () {
+                          changeUif(keyType, currentPolicy, pinController.text);
+                          pinController.text = '';
+                        },
                         borderRadius: BorderRadius.circular(30.0),
                         child: Material(
                           elevation: 1.0,
@@ -362,7 +365,10 @@ class _OpenPGPState extends State<OpenPGP> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       InkWell(
-                        onTap: () => changeUifCacheTime(int.parse(cacheTimeController.text), pinController.text),
+                        onTap: () {
+                          changeUifCacheTime(int.parse(cacheTimeController.text), pinController.text);
+                          pinController.text = '';
+                        },
                         borderRadius: BorderRadius.circular(30.0),
                         child: Material(
                           elevation: 1.0,
@@ -422,13 +428,12 @@ class _OpenPGPState extends State<OpenPGP> {
                         style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 ),
-                Divider(color: Colors.black),
                 Container(
-                  padding: EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0),
-                  child: Text(S.of(context).changePinPrompt(6), style: TextStyle(height: 1.5, fontSize: 15.0)),
+                  padding: EdgeInsets.only(left: 30.0, right: 30.0),
+                  child: Text(S.of(context).changePinPrompt(6, 8), style: TextStyle(height: 1.5, fontSize: 15.0)),
                 ),
                 Container(
-                  padding: EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0),
+                  padding: EdgeInsets.all(20.0),
                   child: TextField(
                     controller: pinController,
                     obscureText: tapOldPin,
@@ -474,16 +479,17 @@ class _OpenPGPState extends State<OpenPGP> {
                     ),
                   ),
                 ),
-                Divider(color: Colors.black),
                 Container(
                   padding: EdgeInsets.all(20.0),
-                  margin: EdgeInsets.only(left: 30.0),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       InkWell(
-                        onTap: () => changePin(pinType, pinController.text, newPinController.text),
+                        onTap: () {
+                          changePin(pinType, pinController.text, newPinController.text);
+                          pinController.text = '';
+                          newPinController.text = '';
+                        },
                         borderRadius: BorderRadius.circular(30.0),
                         child: Material(
                           elevation: 1.0,
@@ -603,8 +609,7 @@ class _OpenPGPState extends State<OpenPGP> {
     Commons.process(context, () async {
       Commons.assertOK(await transceive('00A4040006D2760001240100'));
       if (!await verifyAdminPin(adminPin)) return;
-      Commons.assertOK(
-          await transceive('00DA00' + getKeyUifTag(keyType) + '02' + newPolicy.toValue().toRadixString(16).padLeft(2, '0') + '20'));
+      Commons.assertOK(await transceive('00DA00' + getKeyUifTag(keyType) + '02' + newPolicy.toValue().toRadixString(16).padLeft(2, '0') + '20'));
       Navigator.pop(context);
       Commons.promptSuccess(S.of(context).openpgpUifChanged);
       refresh();

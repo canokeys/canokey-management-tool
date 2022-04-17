@@ -23,7 +23,7 @@
   "successfullyChanged": "修改成功",
   "changePin": "修改 PIN",
   "pinChanged": "PIN 修改成功",
-  "changePinPrompt": "新 PIN 的长度应当为 {min} - 64 个字符。",
+  "changePinPrompt": "新 PIN 的长度应当为 {min} - {max} 个字符。",
   "pinInvalidLength": "长度错误",
   "warning": "警告",
   "delete": "删除",
@@ -101,5 +101,7 @@
   "oathSetCode": "设置口令",
   "oathNewCode": "新口令",
   "oathCodeChanged": "口令已修改",
-  "oathNewCodePrompt": "请输入新口令，如需删除，请留空。"
+  "oathNewCodePrompt": "请输入新口令，如需删除，请留空。",
+
+  "pivChangePUK": "修改 PUK"
 }

@@ -381,6 +381,7 @@ class _SettingsState extends State<Settings> {
                       InkWell(
                         onTap: () {
                           refresh(pinController.text);
+                          pinController.text = '';
                           Navigator.pop(context);
                         },
                         child: Container(
@@ -509,7 +510,10 @@ class _SettingsState extends State<Settings> {
                         ),
                       ),
                       InkWell(
-                        onTap: () => resetApplet(applet, pinController.text),
+                        onTap: () {
+                          resetApplet(applet, pinController.text);
+                          pinController.text = '';
+                        },
                         child: Container(
                           alignment: Alignment.center,
                           padding: EdgeInsets.all(10.0),
@@ -548,7 +552,7 @@ class _SettingsState extends State<Settings> {
                 ),
                 Container(
                   padding: EdgeInsets.only(left: 30.0, right: 30.0),
-                  child: Text(S.of(context).changePinPrompt(6), style: TextStyle(height: 1.5, fontSize: 15.0)),
+                  child: Text(S.of(context).changePinPrompt(6, 64), style: TextStyle(height: 1.5, fontSize: 15.0)),
                 ),
                 Container(
                   padding: EdgeInsets.all(20.0),
@@ -611,7 +615,11 @@ class _SettingsState extends State<Settings> {
                         ),
                       ),
                       InkWell(
-                        onTap: () => changePin(pinController.text, newPinController.text),
+                        onTap: () {
+                          changePin(pinController.text, newPinController.text);
+                          pinController.text = '';
+                          newPinController.text = '';
+                        },
                         child: Container(
                           alignment: Alignment.center,
                           padding: EdgeInsets.all(10.0),

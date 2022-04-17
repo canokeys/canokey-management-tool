@@ -19,7 +19,7 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'zh_Hans';
 
-  static m0(min) => "新 PIN 的长度应当为 ${min} - 64 个字符。";
+  static m0(min, max) => "新 PIN 的长度应当为 ${min} - ${max} 个字符。";
 
   static m1(name) => "您正在删除${name}，删除该项目后无法恢复！请确认相关服务的二步验证已经关闭。";
 
@@ -100,6 +100,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "pinInvalidLength" : MessageLookupByLibrary.simpleMessage("长度错误"),
     "pinLength" : MessageLookupByLibrary.simpleMessage("输入的 PIN 长度错误"),
     "pinRetries" : m3,
+    "pivChangePUK" : MessageLookupByLibrary.simpleMessage("修改 PUK"),
     "pollCanceled" : MessageLookupByLibrary.simpleMessage("您没有选择任何 CanoKey"),
     "pollCanoKey" : MessageLookupByLibrary.simpleMessage("请点击右上角刷新按钮读取 CanoKey"),
     "reset" : MessageLookupByLibrary.simpleMessage("重置"),
