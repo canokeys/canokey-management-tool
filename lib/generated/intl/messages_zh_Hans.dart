@@ -49,6 +49,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "oathAddAccount" : MessageLookupByLibrary.simpleMessage("增加账户"),
     "oathAdded" : MessageLookupByLibrary.simpleMessage("添加成功"),
     "oathAlgorithm" : MessageLookupByLibrary.simpleMessage("算法"),
+    "oathCode" : MessageLookupByLibrary.simpleMessage("口令"),
     "oathCopy" : MessageLookupByLibrary.simpleMessage("复制"),
     "oathCounter" : MessageLookupByLibrary.simpleMessage("计数器初始值"),
     "oathCounterMustBeNumber" : MessageLookupByLibrary.simpleMessage("请填写数字"),

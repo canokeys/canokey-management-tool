@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:base32/base32.dart';
 import 'package:circular_countdown/circular_countdown.dart';
 import 'package:convert/convert.dart';
+import 'package:cryptography/cryptography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
@@ -449,76 +450,82 @@ class _OATHState extends State<OATH> {
   }
 
   void showInputCodeDialog() {
-    bool tapCode = true;
+    bool tapPin = true;
+
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) {
-        return Dialog(
-          elevation: 0.0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-          child: Wrap(
-            children: [
-              Container(
-                padding: EdgeInsets.all(20.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Text(S.of(context).oathInputCode, style: TextStyle(fontWeight: FontWeight.bold)),
-                    Divider(color: Colors.black),
-                    SizedBox(height: 10.0),
-                    Text(S.of(context).oathInputCodePrompt),
-                    SizedBox(height: 10.0),
-                    Container(
-                      padding: EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0),
-                      child: TextField(
-                        controller: codeController,
-                        obscureText: tapCode,
-                        autofocus: true,
-                        decoration: InputDecoration(
-                          labelText: S.of(context).oldPin,
-                          hintText: S.of(context).oldPin,
-                          border: InputBorder.none,
-                          prefixIcon: Icon(Icons.lock_outlined, color: Colors.indigo[500]),
-                          suffixIcon: IconButton(
-                            onPressed: () => setState(() => tapCode = !tapCode),
-                            icon: tapCode
-                                ? Icon(Icons.remove_red_eye_outlined, color: Colors.indigo[500])
-                                : Icon(Icons.visibility_off_outlined, color: Colors.indigo[500]),
-                          ),
-                        ),
+      builder: (BuildContext _) {
+        return StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
+          return Dialog(
+            elevation: 0.0,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+            child: Wrap(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(20.0),
+                  child: Center(child: Text(S.of(context).oathInputCode, style: TextStyle(fontWeight: FontWeight.bold))),
+                ),
+                Container(
+                  padding: EdgeInsets.only(left: 30.0, right: 30.0),
+                  child: Text(S.of(context).oathInputCodePrompt, style: TextStyle(height: 1.5, fontSize: 15.0)),
+                ),
+                Container(
+                  padding: EdgeInsets.all(20.0),
+                  child: TextField(
+                    controller: codeController,
+                    obscureText: tapPin,
+                    autofocus: true,
+                    onSubmitted: (String pin) {
+                      if (pin.isEmpty) return;
+                      refresh();
+                      Navigator.pop(context);
+                    },
+                    decoration: InputDecoration(
+                      labelText: S.of(context).oathCode,
+                      hintText: S.of(context).oathCode,
+                      border: InputBorder.none,
+                      prefixIcon: Icon(Icons.lock_outlined, color: Colors.indigo[500]),
+                      suffixIcon: IconButton(
+                        onPressed: () => setState(() => tapPin = !tapPin),
+                        icon: tapPin
+                            ? Icon(Icons.remove_red_eye_outlined, color: Colors.indigo[500])
+                            : Icon(Icons.visibility_off_outlined, color: Colors.indigo[500]),
                       ),
                     ),
-                    SizedBox(height: 10.0),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-                        InkWell(
-                          onTap: () => Navigator.pop(context),
-                          child: Container(
-                            alignment: Alignment.center,
-                            padding: EdgeInsets.all(10.0),
-                            child: Text(S.of(context).cancel, style: TextStyle(fontWeight: FontWeight.bold)),
-                          ),
-                        ),
-                        InkWell(
-                          onTap: () => {},
-                          child: Container(
-                            alignment: Alignment.center,
-                            padding: EdgeInsets.all(10.0),
-                            decoration: BoxDecoration(),
-                            child: Text(S.of(context).reset, style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        );
+                Container(
+                  padding: EdgeInsets.all(20.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      InkWell(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          alignment: Alignment.center,
+                          padding: EdgeInsets.all(10.0),
+                          child: Text(S.of(context).cancel, style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          refresh();
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          alignment: Alignment.center,
+                          padding: EdgeInsets.all(10.0),
+                          child: Text(S.of(context).confirm, style: TextStyle(color: Colors.indigo, fontWeight: FontWeight.bold)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
       },
     );
   }
@@ -535,8 +542,18 @@ class _OATHState extends State<OATH> {
         if (hex.encode(info[0x79]) == '050505') {
           version = Version.v1;
           if (info.containsKey(0x74)) {
-            showInputCodeDialog();
-            return;
+            if (codeController.text.isEmpty) {
+              // without a pin
+              showInputCodeDialog();
+              return;
+            } else {
+              final hmacSha1 = Hmac(Sha1());
+              final pbkdf2 = Pbkdf2(macAlgorithm: hmacSha1, iterations: 1000, bits: 128);
+              final key = await pbkdf2.deriveKey(secretKey: SecretKey(utf8.encode(codeController.text)), nonce: info[0x71]);
+              final mac = await hmacSha1.calculateMac(info[0x74], secretKey: key);
+              resp = await transceive('00A300001C7514${hex.encode(mac.bytes)}740400000000');
+              Commons.assertOK(resp);
+            }
           }
         }
       }

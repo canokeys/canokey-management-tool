@@ -96,5 +96,6 @@
   "oathDeleted": "Successfully deleted",
   "oathAdded": "Successfully added",
   "oathInputCode": "Unlock CanoKey",
-  "oathInputCodePrompt": "To prevent unauthorized access, this CanoKey is protected with a password."
+  "oathInputCodePrompt": "To prevent unauthorized access, this CanoKey is protected with a passphrase.",
+  "oathCode": "Passphrase"
 }

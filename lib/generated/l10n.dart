@@ -975,11 +975,21 @@ class S {
     );
   }
 
-  /// `To prevent unauthorized access, this CanoKey is protected with a password.`
+  /// `To prevent unauthorized access, this CanoKey is protected with a passphrase.`
   String get oathInputCodePrompt {
     return Intl.message(
-      'To prevent unauthorized access, this CanoKey is protected with a password.',
+      'To prevent unauthorized access, this CanoKey is protected with a passphrase.',
       name: 'oathInputCodePrompt',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Passphrase`
+  String get oathCode {
+    return Intl.message(
+      'Passphrase',
+      name: 'oathCode',
       desc: '',
       args: [],
     );
