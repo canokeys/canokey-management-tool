@@ -994,6 +994,46 @@ class S {
       args: [],
     );
   }
+
+  /// `Set Passphrase`
+  String get oathSetCode {
+    return Intl.message(
+      'Set Passphrase',
+      name: 'oathSetCode',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `New Passphrase`
+  String get oathNewCode {
+    return Intl.message(
+      'New Passphrase',
+      name: 'oathNewCode',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Passphrase Changed`
+  String get oathCodeChanged {
+    return Intl.message(
+      'Passphrase Changed',
+      name: 'oathCodeChanged',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter a new passphrase. Leave it empty to disable current passphrase.`
+  String get oathNewCodePrompt {
+    return Intl.message(
+      'Enter a new passphrase. Leave it empty to disable current passphrase.',
+      name: 'oathNewCodePrompt',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

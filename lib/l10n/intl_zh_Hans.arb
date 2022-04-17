@@ -97,5 +97,9 @@
   "oathAdded": "添加成功",
   "oathInputCode": "解锁 CanoKey",
   "oathInputCodePrompt": "该 CanoKey 受口令保护，请输入口令。",
-  "oathCode": "口令"
+  "oathCode": "口令",
+  "oathSetCode": "设置口令",
+  "oathNewCode": "新口令",
+  "oathCodeChanged": "口令已修改",
+  "oathNewCodePrompt": "请输入新口令，如需删除，请留空。"
 }

@@ -37,6 +37,7 @@ class _OATHState extends State<OATH> {
   TextEditingController periodController = TextEditingController(text: '30');
   TextEditingController counterController = TextEditingController(text: '0');
   TextEditingController codeController = TextEditingController();
+  TextEditingController newCodeController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -52,14 +53,14 @@ class _OATHState extends State<OATH> {
           PopupMenuButton(
             itemBuilder: (BuildContext context) => [
               PopupMenuItem(value: 0, child: Text(S.of(context).add)),
-              PopupMenuItem(value: 1, child: Text('Set Password')),
-              PopupMenuItem(value: 2, child: Text(S.of(context).reset)),
+              PopupMenuItem(value: 1, child: Text(S.of(context).oathSetCode)),
             ],
             onSelected: (idx) async {
               if (idx == 0) {
                 showAddDialog();
               } else if (idx == 1) {
-              } else if (idx == 2) {}
+                showSetCodeDialog();
+              }
             },
             icon: Icon(Icons.more_vert),
           ),
@@ -105,6 +106,7 @@ class _OATHState extends State<OATH> {
     periodController.dispose();
     timerController.dispose();
     codeController.dispose();
+    newCodeController.dispose();
     super.dispose();
   }
 
@@ -530,6 +532,79 @@ class _OATHState extends State<OATH> {
     );
   }
 
+  void showSetCodeDialog() {
+    bool tapNewCode = true;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext _) {
+        return StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
+          return Dialog(
+            elevation: 0.0,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+            child: Wrap(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(20.0),
+                  child: Center(child: Text(S.of(context).oathSetCode, style: TextStyle(fontWeight: FontWeight.bold))),
+                ),
+                Container(
+                  padding: EdgeInsets.only(left: 30.0, right: 30.0),
+                  child: Text(S.of(context).oathNewCodePrompt, style: TextStyle(height: 1.5, fontSize: 15.0)),
+                ),
+                Container(
+                  padding: EdgeInsets.all(20.0),
+                  child: TextField(
+                    controller: newCodeController,
+                    obscureText: tapNewCode,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      labelText: S.of(context).oathNewCode,
+                      hintText: S.of(context).oathNewCode,
+                      border: InputBorder.none,
+                      prefixIcon: Icon(Icons.lock_outlined, color: Colors.indigo[500]),
+                      suffixIcon: IconButton(
+                        onPressed: () => setState(() => tapNewCode = !tapNewCode),
+                        icon: tapNewCode
+                            ? Icon(Icons.remove_red_eye_outlined, color: Colors.indigo[500])
+                            : Icon(Icons.visibility_off_outlined, color: Colors.indigo[500]),
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.all(20.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      InkWell(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          alignment: Alignment.center,
+                          padding: EdgeInsets.all(10.0),
+                          child: Text(S.of(context).close, style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () => setCode(newCodeController.text),
+                        child: Container(
+                          alignment: Alignment.center,
+                          padding: EdgeInsets.all(10.0),
+                          child: Text(S.of(context).save, style: TextStyle(color: Colors.indigo, fontWeight: FontWeight.bold)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+      },
+    );
+  }
+
   void refresh() {
     Commons.process(context, () async {
       String resp = await transceive('00A4040007A0000005272101');
@@ -538,7 +613,6 @@ class _OATHState extends State<OATH> {
         version = Version.legacy;
       } else {
         Map info = TLV.parse(hex.decode(Commons.dropSW(resp)));
-        print(info);
         if (hex.encode(info[0x79]) == '050505') {
           version = Version.v1;
           if (info.containsKey(0x74)) {
@@ -641,6 +715,34 @@ class _OATHState extends State<OATH> {
       Commons.promptSuccess(S.of(context).oathDeleted);
       Navigator.pop(context);
       refresh();
+    });
+  }
+
+  void setCode(String code) {
+    Commons.process(context, () async {
+      String resp = await transceive('00A4040007A0000005272101');
+      Commons.assertOK(resp);
+      if (resp == '9000') {
+        return;
+      } else {
+        Map info = TLV.parse(hex.decode(Commons.dropSW(resp)));
+        if (hex.encode(info[0x79]) == '050505') {
+          if (code.isEmpty) {
+            resp = await transceive('00030000027300');
+          } else {
+            final hmacSha1 = Hmac(Sha1());
+            final pbkdf2 = Pbkdf2(macAlgorithm: hmacSha1, iterations: 1000, bits: 128);
+            final key = await pbkdf2.deriveKey(secretKey: SecretKey(utf8.encode(code)), nonce: info[0x71]);
+            final keyString = hex.encode(await key.extractBytes());
+            final mac = await hmacSha1.calculateMac(List.of([0, 0, 0, 0]), secretKey: key);
+            resp = await transceive('000300002F731101${keyString}7404000000007514${hex.encode(mac.bytes)}');
+          }
+          Commons.assertOK(resp);
+          codeController.text = code;
+          Commons.promptSuccess(S.of(context).oathCodeChanged);
+          Navigator.pop(context);
+        }
+      }
     });
   }
 

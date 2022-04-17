@@ -97,5 +97,9 @@
   "oathAdded": "Successfully added",
   "oathInputCode": "Unlock CanoKey",
   "oathInputCodePrompt": "To prevent unauthorized access, this CanoKey is protected with a passphrase.",
-  "oathCode": "Passphrase"
+  "oathCode": "Passphrase",
+  "oathSetCode": "Set Passphrase",
+  "oathNewCode": "New Passphrase",
+  "oathCodeChanged": "Passphrase Changed",
+  "oathNewCodePrompt": "Enter a new passphrase. Leave it empty to disable current passphrase."
 }
