@@ -331,7 +331,7 @@ class _OATHState extends State<OATH> {
                               padding: EdgeInsets.only(left: 15.0, right: 15.0, bottom: 20.0),
                               child: CheckboxListTile(
                                 value: requireTouch,
-                                onChanged: (e) => {requireTouch = e!},
+                                onChanged: (e) => setState(() => requireTouch = e!),
                                 title: Text(S.of(context).oathRequireTouch),
                               ),
                             ),
@@ -661,7 +661,12 @@ class _OATHState extends State<OATH> {
           (type.toValue() | algo.toValue()).toRadixString(16).padLeft(2, '0') + // type & algo
           digits.toRadixString(16).padLeft(2, '0') + // digits
           key;
-      if (requireTouch) capduData += '780102';
+      if (requireTouch) {
+        if (version == Version.legacy)
+          capduData += '780102';
+        else
+          capduData += '7802';
+      }
       if (initValue > 0) capduData += '7A04' + initValue.toRadixString(16).padLeft(4, '0');
 
       resp = await transceive('00010000' + (capduData.length ~/ 2).toRadixString(16).padLeft(2, '0') + capduData);
