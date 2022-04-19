@@ -30,7 +30,7 @@ class Commons {
       } else if (e.message == 'NetworkError: A transfer error has occurred.') {
         promptFailure(S.of(context).networkError);
       } else {
-        promptFailure(e.message);
+        promptFailure(e.message ?? 'Unknown error');
       }
     } finally {
       FlutterNfcKit.finish(closeWebUSB: false);

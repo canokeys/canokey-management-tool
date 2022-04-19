@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_web_frame/flutter_web_frame.dart';
 import 'package:logging/logging.dart';
 import 'package:navigation_history_observer/navigation_history_observer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'components/oath.dart';
 import 'components/openpgp.dart';
@@ -19,14 +19,58 @@ main() {
   Logger.root.onRecord.listen((record) {
     print('${record.level.name}: ${record.time}: ${record.message}');
   });
-  // SharedPreferences prefs = await SharedPreferences.getInstance();
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then((_) {
-    runApp(MyApp());
-  });
+  runApp(MainApp());
 }
 
-class MyApp extends StatelessWidget {
+final log = Logger('ManagementTool:Main');
+
+class MainApp extends StatefulWidget {
+  static void setLanguage(BuildContext context, String lang) async {
+    _MainAppState? state = context.findAncestorStateOfType<_MainAppState>();
+
+    var prefs = await SharedPreferences.getInstance();
+    prefs.setString('lang', lang);
+
+    state?.setState(() {
+      state._locale = getLocale(lang);
+    });
+  }
+
+  static Locale getLocale(String lang) {
+    Locale locale;
+    switch (lang) {
+      case 'English':
+        locale = Locale('en');
+        break;
+      case '简体中文':
+        locale = Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans');
+        break;
+      default:
+        log.warning('unknown language $lang');
+        locale = Locale('en');
+    }
+    return locale;
+  }
+
+  @override
+  _MainAppState createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
+  Locale _locale = Locale('en');
+
+  @override
+  void initState() {
+    super.initState();
+    SharedPreferences.getInstance().then((prefs) {
+      String lang = prefs.getString('lang') ?? 'English';
+      setState(() {
+        this._locale = MainApp.getLocale(lang);
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return FlutterWebFrame(
@@ -39,7 +83,7 @@ class MyApp extends StatelessWidget {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: S.delegate.supportedLocales,
-          locale: Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans'),
+          locale: _locale,
           onGenerateTitle: (context) => S.of(context).homeScreenTitle,
           theme: ThemeData(primarySwatch: Colors.blue, visualDensity: VisualDensity.adaptivePlatformDensity),
           debugShowCheckedModeBanner: false,

@@ -2,9 +2,11 @@ import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:logging/logging.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../drawer.dart';
 import '../generated/l10n.dart';
+import '../main.dart';
 import '../utils/NumericalRangeFormatter.dart';
 import '../utils/commons.dart';
 
@@ -18,11 +20,24 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  TextEditingController pinController = TextEditingController();
-  TextEditingController newPinController = TextEditingController();
-  TextEditingController cacheTimeController = TextEditingController();
-  CanoKey key;
-  String pin;
+  final prefsFut = SharedPreferences.getInstance();
+  final TextEditingController pinController = TextEditingController();
+  final TextEditingController newPinController = TextEditingController();
+  final TextEditingController cacheTimeController = TextEditingController();
+  CanoKey? key;
+  String? pin;
+  String currentLanguage = 'English';
+
+  @override
+  void initState() {
+    super.initState();
+    SharedPreferences.getInstance().then((prefs) {
+      String lang = prefs.getString('lang') ?? 'English';
+      setState(() {
+        this.currentLanguage = lang;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,40 +65,40 @@ class _SettingsState extends State<Settings> {
             ] else ...[
               Text(S.of(context).settingsInfo, style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold)),
               SizedBox(height: 15.0),
-              itemTile(width, Icons.mode, S.of(context).settingsModel, key.model),
-              itemTile(width, Icons.info, S.of(context).settingsFirmwareVersion, key.firmwareVersion),
-              itemTile(width, Icons.vpn_key, S.of(context).settingsSN, key.sn),
-              itemTile(width, Icons.memory, S.of(context).settingsChipId, key.chipId),
+              itemTile(width, Icons.mode, S.of(context).settingsModel, key!.model),
+              itemTile(width, Icons.info, S.of(context).settingsFirmwareVersion, key!.firmwareVersion),
+              itemTile(width, Icons.vpn_key, S.of(context).settingsSN, key!.sn),
+              itemTile(width, Icons.memory, S.of(context).settingsChipId, key!.chipId),
               SizedBox(height: 25.0),
               Text(S.of(context).settings, style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold)),
               SizedBox(height: 15.0),
-              if (key.functionSet().contains(Func.led))
-                itemTile(width, Icons.light_mode, 'LED', key.ledOn ? S.of(context).on : S.of(context).off,
-                    () => showChangeSwitchDialog('LED', Func.led, key.ledOn)),
-              if (key.functionSet().contains(Func.hotp))
-                itemTile(width, Icons.keyboard_alt_outlined, S.of(context).settingsHotp, key.hotpOn ? S.of(context).on : S.of(context).off,
-                    () => showChangeSwitchDialog(S.of(context).settingsHotp, Func.hotp, key.hotpOn)),
-              if (key.functionSet().contains(Func.webusbLandingPage))
-                itemTile(width, Icons.web, S.of(context).settingsWebUSB, key.webusbLandingEnabled ? S.of(context).on : S.of(context).off,
-                    () => showChangeSwitchDialog(S.of(context).settingsWebUSB, Func.webusbLandingPage, key.webusbLandingEnabled)),
-              if (key.functionSet().contains(Func.ndefEnabled))
-                itemTile(width, Icons.nfc, S.of(context).settingsNDEF, key.ndefEnabled ? S.of(context).on : S.of(context).off,
-                    () => showChangeSwitchDialog(S.of(context).settingsNDEF, Func.ndefEnabled, key.ndefEnabled)),
-              if (key.functionSet().contains(Func.ndefReadonly))
-                itemTile(width, Icons.brush, S.of(context).settingsNDEFReadonly, key.ndefReadonly ? S.of(context).on : S.of(context).off,
-                    () => showChangeSwitchDialog(S.of(context).settingsNDEFReadonly, Func.ndefReadonly, key.ndefReadonly)),
-              if (key.functionSet().contains(Func.sigTouch)) ...[
+              if (key!.functionSet().contains(Func.led))
+                itemTile(width, Icons.light_mode, 'LED', key!.ledOn ? S.of(context).on : S.of(context).off,
+                    () => showChangeSwitchDialog('LED', Func.led, key!.ledOn)),
+              if (key!.functionSet().contains(Func.hotp))
+                itemTile(width, Icons.keyboard_alt_outlined, S.of(context).settingsHotp, key!.hotpOn ? S.of(context).on : S.of(context).off,
+                    () => showChangeSwitchDialog(S.of(context).settingsHotp, Func.hotp, key!.hotpOn)),
+              if (key!.functionSet().contains(Func.webusbLandingPage))
+                itemTile(width, Icons.web, S.of(context).settingsWebUSB, key!.webusbLandingEnabled ? S.of(context).on : S.of(context).off,
+                    () => showChangeSwitchDialog(S.of(context).settingsWebUSB, Func.webusbLandingPage, key!.webusbLandingEnabled)),
+              if (key!.functionSet().contains(Func.ndefEnabled))
+                itemTile(width, Icons.nfc, S.of(context).settingsNDEF, key!.ndefEnabled ? S.of(context).on : S.of(context).off,
+                    () => showChangeSwitchDialog(S.of(context).settingsNDEF, Func.ndefEnabled, key!.ndefEnabled)),
+              if (key!.functionSet().contains(Func.ndefReadonly))
+                itemTile(width, Icons.brush, S.of(context).settingsNDEFReadonly, key!.ndefReadonly ? S.of(context).on : S.of(context).off,
+                    () => showChangeSwitchDialog(S.of(context).settingsNDEFReadonly, Func.ndefReadonly, key!.ndefReadonly)),
+              if (key!.functionSet().contains(Func.sigTouch)) ...[
                 // OpenPGP options work together
                 SizedBox(height: 25.0),
                 Text('OpenPGP ' + S.of(context).openpgpUIF, style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold)),
                 SizedBox(height: 15.0),
-                itemTile(width, Icons.brush, S.of(context).openpgpSignature, key.sigTouch ? S.of(context).on : S.of(context).off,
-                    () => showChangeSwitchDialog(S.of(context).openpgpSignature, Func.led, key.ledOn)),
-                itemTile(width, Icons.brush, S.of(context).openpgpEncryption, key.decTouch ? S.of(context).on : S.of(context).off,
-                    () => showChangeSwitchDialog(S.of(context).openpgpEncryption, Func.led, key.ledOn)),
-                itemTile(width, Icons.brush, S.of(context).openpgpAuthentication, key.autTouch ? S.of(context).on : S.of(context).off,
-                    () => showChangeSwitchDialog(S.of(context).openpgpAuthentication, Func.led, key.ledOn)),
-                itemTile(width, Icons.brush, S.of(context).openpgpUifCacheTime, key.touchCacheTime.toString(), showChangeCacheTimeDialog),
+                itemTile(width, Icons.brush, S.of(context).openpgpSignature, key!.sigTouch ? S.of(context).on : S.of(context).off,
+                    () => showChangeSwitchDialog(S.of(context).openpgpSignature, Func.led, key!.ledOn)),
+                itemTile(width, Icons.brush, S.of(context).openpgpEncryption, key!.decTouch ? S.of(context).on : S.of(context).off,
+                    () => showChangeSwitchDialog(S.of(context).openpgpEncryption, Func.led, key!.ledOn)),
+                itemTile(width, Icons.brush, S.of(context).openpgpAuthentication, key!.autTouch ? S.of(context).on : S.of(context).off,
+                    () => showChangeSwitchDialog(S.of(context).openpgpAuthentication, Func.led, key!.ledOn)),
+                itemTile(width, Icons.brush, S.of(context).openpgpUifCacheTime, key!.touchCacheTime.toString(), showChangeCacheTimeDialog),
               ]
             ],
             Text(S.of(context).actions, style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold)),
@@ -180,7 +195,7 @@ class _SettingsState extends State<Settings> {
             ),
             SizedBox(height: 25.0),
             Text(S.of(context).settingsOtherSettings, style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold)),
-            itemTile(width, Icons.language, S.of(context).settingsLanguage, '简体中文', () => showChangeLanguageDialog('简体中文')),
+            itemTile(width, Icons.language, S.of(context).settingsLanguage, currentLanguage, () => showChangeLanguageDialog(currentLanguage)),
           ],
         ),
       ),
@@ -195,7 +210,7 @@ class _SettingsState extends State<Settings> {
     super.dispose();
   }
 
-  Widget itemTile(double width, IconData icon, String title, String subtitle, [Function handler]) {
+  Widget itemTile(double width, IconData icon, String title, String subtitle, [GestureTapCallback? handler]) {
     return Container(
       padding: EdgeInsets.all(10.0),
       child: Column(
@@ -301,7 +316,7 @@ class _SettingsState extends State<Settings> {
                         ),
                       ),
                       InkWell(
-                        onTap: () => changeSwitch(function, currentStatus, pin),
+                        onTap: () => changeSwitch(function, currentStatus, pin!),
                         child: Container(
                           alignment: Alignment.center,
                           padding: EdgeInsets.all(10.0),
@@ -534,7 +549,7 @@ class _SettingsState extends State<Settings> {
   void showChangePinDialog() {
     bool tapPin = true;
     bool tapNewPin = true;
-    String errorText;
+    String? errorText;
 
     showDialog(
       context: context,
@@ -700,7 +715,7 @@ class _SettingsState extends State<Settings> {
                         ),
                       ),
                       InkWell(
-                        onTap: () => changeTouchCacheTime(int.parse(cacheTimeController.text), pin),
+                        onTap: () => changeTouchCacheTime(int.parse(cacheTimeController.text), pin!),
                         child: Container(
                           alignment: Alignment.center,
                           padding: EdgeInsets.all(10.0),
@@ -718,7 +733,7 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  void showChangeLanguageDialog(String currentLanguage) {
+  void showChangeLanguageDialog(String newLanguage) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -726,12 +741,12 @@ class _SettingsState extends State<Settings> {
         return StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
           item(String language) {
             return InkWell(
-              onTap: () => setState(() => currentLanguage = language),
+              onTap: () => setState(() => newLanguage = language),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  if (currentLanguage == language) Icon(Icons.check, size: 28.0, color: Colors.indigo[500]) else SizedBox(width: 28.0, height: 28.0),
+                  if (newLanguage == language) Icon(Icons.check, size: 28.0, color: Colors.indigo[500]) else SizedBox(width: 28.0, height: 28.0),
                   SizedBox(width: 20.0),
                   Text(language, style: TextStyle(fontWeight: FontWeight.bold)),
                 ],
@@ -774,7 +789,11 @@ class _SettingsState extends State<Settings> {
                         ),
                       ),
                       InkWell(
-                        onTap: () {},
+                        onTap: () {
+                          MainApp.setLanguage(context, newLanguage);
+                          currentLanguage = newLanguage;
+                          Navigator.pop(context);
+                        },
                         child: Container(
                           alignment: Alignment.center,
                           padding: EdgeInsets.all(10.0),

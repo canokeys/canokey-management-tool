@@ -1,5 +1,7 @@
 {
   "homeScreenTitle": "CanoKey Management Tool",
+  "homePress": "Press",
+  "homeSelect": "to select an applet",
   "home": "Home",
   "settings": "Settings",
   "save": "Save",

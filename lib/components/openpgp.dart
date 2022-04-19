@@ -25,7 +25,7 @@ class _OpenPGPState extends State<OpenPGP> {
   TextEditingController cacheTimeController = TextEditingController();
   TextEditingController pinController = TextEditingController();
   TextEditingController newPinController = TextEditingController();
-  OpenPGPCard card;
+  OpenPGPCard? card;
 
   @override
   Widget build(BuildContext context) {
@@ -53,28 +53,28 @@ class _OpenPGPState extends State<OpenPGP> {
             ] else ...[
               Text(S.of(context).openpgpCardInfo, style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold)),
               SizedBox(height: 15.0),
-              itemTile(width, Icons.add, S.of(context).openpgpVersion, card.version),
-              itemTile(width, Icons.shopping_bag, S.of(context).openpgpManufacturer, card.manufacturer),
-              itemTile(width, Icons.vpn_key, S.of(context).openpgpSN, card.sn),
-              itemTile(width, Icons.person, S.of(context).openpgpCardHolder, card.cardHolder),
-              itemTile(width, Icons.star, S.of(context).openpgpPubkeyUrl, card.publicKeyUrl),
+              itemTile(width, Icons.add, S.of(context).openpgpVersion, card!.version),
+              itemTile(width, Icons.shopping_bag, S.of(context).openpgpManufacturer, card!.manufacturer),
+              itemTile(width, Icons.vpn_key, S.of(context).openpgpSN, card!.sn),
+              itemTile(width, Icons.person, S.of(context).openpgpCardHolder, card!.cardHolder),
+              itemTile(width, Icons.star, S.of(context).openpgpPubkeyUrl, card!.publicKeyUrl),
               SizedBox(height: 25.0),
               Text(S.of(context).openpgpKeys, style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold)),
               SizedBox(height: 15.0),
-              itemTile(width, Icons.lock_outline, S.of(context).openpgpSignature, card.signature),
-              itemTile(width, Icons.lock_outline, S.of(context).openpgpEncryption, card.encryption),
-              itemTile(width, Icons.lock_outline, S.of(context).openpgpAuthentication, card.authentication),
+              itemTile(width, Icons.lock_outline, S.of(context).openpgpSignature, card!.signature),
+              itemTile(width, Icons.lock_outline, S.of(context).openpgpEncryption, card!.encryption),
+              itemTile(width, Icons.lock_outline, S.of(context).openpgpAuthentication, card!.authentication),
               SizedBox(height: 25.0),
-              if (card.uifSig != TouchPolicy.na) ...[
+              if (card!.uifSig != TouchPolicy.na) ...[
                 Text(S.of(context).openpgpUIF, style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold)),
                 SizedBox(height: 15.0),
-                itemTile(width, Icons.touch_app, S.of(context).openpgpSignature, card.uifSig.toText(context),
-                    card.uifSig == TouchPolicy.permanent ? null : () => showChangeUifDialog(KeyType.signature, card.uifSig)),
-                itemTile(width, Icons.touch_app, S.of(context).openpgpEncryption, card.uifEnc.toText(context),
-                    card.uifEnc == TouchPolicy.permanent ? null : () => showChangeUifDialog(KeyType.encryption, card.uifEnc)),
-                itemTile(width, Icons.touch_app, S.of(context).openpgpAuthentication, card.uifAut.toText(context),
-                    card.uifAut == TouchPolicy.permanent ? null : () => showChangeUifDialog(KeyType.authentication, card.uifAut)),
-                itemTile(width, Icons.timelapse, S.of(context).openpgpUifCacheTime, '${card.uifCacheTime}s', showChangeCacheTimeDialog),
+                itemTile(width, Icons.touch_app, S.of(context).openpgpSignature, card!.uifSig.toText(context),
+                    card!.uifSig == TouchPolicy.permanent ? null : () => showChangeUifDialog(KeyType.signature, card!.uifSig)),
+                itemTile(width, Icons.touch_app, S.of(context).openpgpEncryption, card!.uifEnc.toText(context),
+                    card!.uifEnc == TouchPolicy.permanent ? null : () => showChangeUifDialog(KeyType.encryption, card!.uifEnc)),
+                itemTile(width, Icons.touch_app, S.of(context).openpgpAuthentication, card!.uifAut.toText(context),
+                    card!.uifAut == TouchPolicy.permanent ? null : () => showChangeUifDialog(KeyType.authentication, card!.uifAut)),
+                itemTile(width, Icons.timelapse, S.of(context).openpgpUifCacheTime, '${card!.uifCacheTime}s', showChangeCacheTimeDialog),
                 SizedBox(height: 25.0),
               ],
               Text(S.of(context).actions, style: TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold)),
@@ -127,7 +127,7 @@ class _OpenPGPState extends State<OpenPGP> {
     super.dispose();
   }
 
-  Widget itemTile(double width, IconData icon, String title, String subtitle, [Function handler]) {
+  Widget itemTile(double width, IconData icon, String title, String subtitle, [GestureTapCallback? handler]) {
     return Container(
       padding: EdgeInsets.all(10.0),
       child: Column(
@@ -409,7 +409,7 @@ class _OpenPGPState extends State<OpenPGP> {
     final newPinMinLength = pinType == PinType.adminPin ? 8 : 6;
     bool tapOldPin = true;
     bool tapNewPin = true;
-    String errorText;
+    String? errorText;
 
     showDialog(
       context: context,
@@ -582,7 +582,7 @@ class _OpenPGPState extends State<OpenPGP> {
       String name = String.fromCharCodes(info[0x5B]);
 
       setState(() {
-        card = OpenPGPCard(version, manufacturers[manufacturerId], sn, name, url, sigKey, encKey, autKey, uifSig, uifEnc, uifAut, cacheTime);
+        card = OpenPGPCard(version, manufacturers[manufacturerId] ?? 'Unknown', sn, name, url, sigKey, encKey, autKey, uifSig, uifEnc, uifAut, cacheTime);
       });
     });
   }

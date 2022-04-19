@@ -1,5 +1,7 @@
 {
   "homeScreenTitle": "CanoKey 管理工具",
+  "homePress": "点击",
+  "homeSelect": "选择应用",
   "home": "首页",
   "settings": "设置",
   "save": "保存",

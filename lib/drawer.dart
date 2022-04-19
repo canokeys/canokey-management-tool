@@ -56,7 +56,7 @@ class AppDrawer extends StatelessWidget {
   }
 
   void doRoute(BuildContext context, String name) {
-    if (NavigationHistoryObserver().top.settings.name != name)
+    if (NavigationHistoryObserver().top!.settings.name != name)
       Navigator.pushReplacementNamed(context, name);
     else
       Navigator.pop(context);

@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
 class TLV {
-  static Map parse(Uint8List buf) {
-    return _parse(buf, 0, buf.length);
+  static Map parse(List<int> buf) {
+    return _parse(Uint8List.fromList(buf), 0, buf.length);
   }
 
   static Map _parse(Uint8List buf, int off, int len) {

@@ -91,7 +91,7 @@ class _PIVState extends State<PIV> {
     super.dispose();
   }
 
-  Widget itemTile(double width, IconData icon, String title, String subtitle, [Function handler]) {
+  Widget itemTile(double width, IconData icon, String title, String subtitle, [GestureTapCallback? handler]) {
     return Container(
       padding: EdgeInsets.all(10.0),
       child: Column(
@@ -144,7 +144,7 @@ class _PIVState extends State<PIV> {
   void showChangePinDialog(PinType pinType) {
     bool tapOldPin = true;
     bool tapNewPin = true;
-    String errorText;
+    String? errorText;
 
     showDialog(
       context: context,

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:base32/base32.dart';
 import 'package:circular_countdown/circular_countdown.dart';
@@ -29,7 +28,7 @@ class OATH extends StatefulWidget {
 class _OATHState extends State<OATH> {
   bool polled = false;
   List<OathItem> items = [];
-  Version version;
+  Version version = Version.v1;
   TimerController timerController = TimerController.seconds(30);
   TextEditingController issuerController = TextEditingController();
   TextEditingController accountController = TextEditingController();
@@ -212,7 +211,7 @@ class _OATHState extends State<OATH> {
     Algorithm algo = Algorithm.sha1;
     int digits = 6;
     bool requireTouch = false;
-    String accountErrorText, secretKeyErrorText, periodErrorText, counterErrorText;
+    String? accountErrorText, secretKeyErrorText, periodErrorText, counterErrorText;
 
     showDialog(
         context: context,
@@ -261,7 +260,7 @@ class _OATHState extends State<OATH> {
                               children: [
                                 FractionallySizedBox(
                                   widthFactor: 0.45,
-                                  child: DropdownButtonFormField(
+                                  child: DropdownButtonFormField<Type>(
                                     isExpanded: true,
                                     decoration: InputDecoration(labelText: S.of(context).oathType),
                                     value: type,
@@ -270,13 +269,13 @@ class _OATHState extends State<OATH> {
                                       DropdownMenuItem(child: Text('HOTP'), value: Type.hotp),
                                     ],
                                     onChanged: (e) => {
-                                      setState(() => {type = e})
+                                      setState(() => {type = e!})
                                     },
                                   ),
                                 ),
                                 FractionallySizedBox(
                                   widthFactor: 0.45,
-                                  child: DropdownButtonFormField(
+                                  child: DropdownButtonFormField<Algorithm>(
                                     isExpanded: true,
                                     decoration: InputDecoration(labelText: S.of(context).oathAlgorithm),
                                     value: algo,
@@ -285,12 +284,12 @@ class _OATHState extends State<OATH> {
                                       DropdownMenuItem(child: Text('SHA-256'), value: Algorithm.sha256),
                                       DropdownMenuItem(child: Text('SHA-512'), value: Algorithm.sha512),
                                     ],
-                                    onChanged: (e) => {algo = e},
+                                    onChanged: (e) => {algo = e!},
                                   ),
                                 ),
                                 FractionallySizedBox(
                                   widthFactor: 0.45,
-                                  child: DropdownButtonFormField(
+                                  child: DropdownButtonFormField<int>(
                                     isExpanded: true,
                                     decoration: InputDecoration(labelText: S.of(context).oathDigits),
                                     value: digits,
@@ -300,7 +299,7 @@ class _OATHState extends State<OATH> {
                                       DropdownMenuItem(child: Text('7'), value: 7),
                                       DropdownMenuItem(child: Text('8'), value: 8),
                                     ],
-                                    onChanged: (e) => {digits = e},
+                                    onChanged: (e) => {digits = e!},
                                   ),
                                 ),
                                 if (type == Type.totp)
@@ -332,7 +331,7 @@ class _OATHState extends State<OATH> {
                               padding: EdgeInsets.only(left: 15.0, right: 15.0, bottom: 20.0),
                               child: CheckboxListTile(
                                 value: requireTouch,
-                                onChanged: (e) => {requireTouch = e},
+                                onChanged: (e) => {requireTouch = e!},
                                 title: Text(S.of(context).oathRequireTouch),
                               ),
                             ),
@@ -354,7 +353,7 @@ class _OATHState extends State<OATH> {
                                   if (accountController.text.length + issuerController.text.length > 63) account = S.of(context).oathTooLong;
                                   if (secretKeyController.text.isEmpty) secretKey = S.of(context).oathRequired;
                                   if (secretKeyController.text.length > 52) secretKey = S.of(context).oathTooLong;
-                                  String secretHex;
+                                  late String secretHex;
                                   try {
                                     secretHex = base32.decodeAsHexString(secretKeyController.text);
                                   } catch (e) {
@@ -639,7 +638,7 @@ class _OATHState extends State<OATH> {
         resp = await transceive('000500000A7408$challengeStr');
       }
       Commons.assertOK(resp);
-      Uint8List data = hex.decode(Commons.dropSW(resp));
+      List<int> data = hex.decode(Commons.dropSW(resp));
       setState(() {
         polled = true;
         items = parseV1(data);
@@ -655,7 +654,7 @@ class _OATHState extends State<OATH> {
       String resp = await transceive('00A4040007A0000005272101');
       Commons.assertOK(resp);
 
-      Uint8List nameBytes = utf8.encode(name);
+      List<int> nameBytes = utf8.encode(name);
       String capduData = '71' + nameBytes.length.toRadixString(16).padLeft(2, '0') + hex.encode(nameBytes); // name 0x71
       capduData += '73' +
           (key.length ~/ 2 + 2).toRadixString(16).padLeft(2, '0') + // length
@@ -679,11 +678,11 @@ class _OATHState extends State<OATH> {
   }
 
   Future<String> calculate(String name, Type type) async {
-    String code;
+    late String code;
     await Commons.process(context, () async {
       String resp = await transceive('00A4040007A0000005272101');
       Commons.assertOK(resp);
-      Uint8List nameBytes = utf8.encode(name);
+      List<int> nameBytes = utf8.encode(name);
       String capduData = '71' + nameBytes.length.toRadixString(16).padLeft(2, '0') + hex.encode(nameBytes);
       if (type == Type.totp) {
         int challenge = DateTime.now().millisecondsSinceEpoch ~/ 30000;
@@ -696,7 +695,7 @@ class _OATHState extends State<OATH> {
         resp = await transceive('00040000' + (capduData.length ~/ 2).toRadixString(16).padLeft(2, '0') + capduData);
       }
       Commons.assertOK(resp);
-      Uint8List data = hex.decode(Commons.dropSW(resp));
+      List<int> data = hex.decode(Commons.dropSW(resp));
       code = parseResponse(data.sublist(2));
       setState(() {
         items.firstWhere((e) => e.name == name).code = code;
@@ -709,7 +708,7 @@ class _OATHState extends State<OATH> {
     Commons.process(context, () async {
       String resp = await transceive('00A4040007A0000005272101');
       Commons.assertOK(resp);
-      Uint8List nameBytes = utf8.encode(name);
+      List<int> nameBytes = utf8.encode(name);
       String capduData = '71' + nameBytes.length.toRadixString(16).padLeft(2, '0') + hex.encode(nameBytes);
       Commons.assertOK(await transceive('00020000' + (capduData.length ~/ 2).toRadixString(16).padLeft(2, '0') + capduData));
       Commons.promptSuccess(S.of(context).oathDeleted);
@@ -750,7 +749,7 @@ class _OATHState extends State<OATH> {
     Commons.process(context, () async {
       String resp = await transceive('00A4040007A0000005272101');
       Commons.assertOK(resp);
-      Uint8List nameBytes = utf8.encode(name);
+      List<int> nameBytes = utf8.encode(name);
       String capduData = '71' + nameBytes.length.toRadixString(16).padLeft(2, '0') + hex.encode(nameBytes);
       Commons.assertOK(await transceive('00550000' + (capduData.length ~/ 2).toRadixString(16).padLeft(2, '0') + capduData));
       Commons.promptSuccess(S.of(context).successfullyChanged);
@@ -758,7 +757,7 @@ class _OATHState extends State<OATH> {
     });
   }
 
-  List<OathItem> parseV1(Uint8List data) {
+  List<OathItem> parseV1(List<int> data) {
     List<OathItem> result = [];
     int pos = 0;
     while (pos < data.length) {
@@ -769,7 +768,7 @@ class _OATHState extends State<OATH> {
     return result;
   }
 
-  OathItem parseSingleV1(Uint8List data) {
+  OathItem parseSingleV1(List<int> data) {
     assert(data.length >= 4);
     assert(data[0] == 0x71);
     int nameLen = data[1];
@@ -795,7 +794,7 @@ class _OATHState extends State<OATH> {
     return item;
   }
 
-  String parseResponse(Uint8List resp) {
+  String parseResponse(List<int> resp) {
     assert(resp.length == 5);
     int digits = resp[0];
     int rawCode = (resp[1] << 24) | (resp[2] << 16) | (resp[3] << 8) | resp[4];
