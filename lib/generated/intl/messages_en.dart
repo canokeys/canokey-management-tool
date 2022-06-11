@@ -145,6 +145,9 @@ class MessageLookup extends MessageLookupByLibrary {
         "settingsChipId": MessageLookupByLibrary.simpleMessage("Chip ID"),
         "settingsFirmwareVersion":
             MessageLookupByLibrary.simpleMessage("Firmware Version"),
+        "settingsFixNFC": MessageLookupByLibrary.simpleMessage("Fix NFC"),
+        "settingsFixNFCSuccess":
+            MessageLookupByLibrary.simpleMessage("NFC is successfully fixed"),
         "settingsHotp":
             MessageLookupByLibrary.simpleMessage("Input HOTP when touching"),
         "settingsInfo": MessageLookupByLibrary.simpleMessage("CanoKey Info"),

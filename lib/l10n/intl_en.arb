@@ -77,6 +77,8 @@
   "settingsResetConditionNotSatisfying": "PIN has not been locked yet",
   "settingsResetPresenceTestFailed": "You did not touch the pad in time",
   "settingsChangeLanguage": "Change Language",
+  "settingsFixNFC": "Fix NFC",
+  "settingsFixNFCSuccess": "NFC is successfully fixed",
 
   "oathDelete": "This action will delete the account {name} from your CanoKey. Make sure 2FA has been disabled on the web service.",
   "oathCopy": "Copy to Clipboard",

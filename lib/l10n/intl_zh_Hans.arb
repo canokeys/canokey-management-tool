@@ -77,6 +77,8 @@
   "settingsResetConditionNotSatisfying": "PIN 尚未锁定",
   "settingsResetPresenceTestFailed": "请按提示触摸",
   "settingsChangeLanguage": "修改语言",
+  "settingsFixNFC": "修复 NFC",
+  "settingsFixNFCSuccess": "修复 NFC 成功",
 
   "oathDelete": "您正在删除{name}，删除该项目后无法恢复！请确认相关服务的二步验证已经关闭。",
   "oathCopy": "复制",

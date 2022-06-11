@@ -122,6 +122,9 @@ class MessageLookup extends MessageLookupByLibrary {
         "settingsChangeLanguage": MessageLookupByLibrary.simpleMessage("修改语言"),
         "settingsChipId": MessageLookupByLibrary.simpleMessage("芯片 ID"),
         "settingsFirmwareVersion": MessageLookupByLibrary.simpleMessage("固件版本"),
+        "settingsFixNFC": MessageLookupByLibrary.simpleMessage("修复 NFC"),
+        "settingsFixNFCSuccess":
+            MessageLookupByLibrary.simpleMessage("修复 NFC 成功"),
         "settingsHotp": MessageLookupByLibrary.simpleMessage("触摸时输出 HOTP"),
         "settingsInfo": MessageLookupByLibrary.simpleMessage("CanoKey 信息"),
         "settingsInputPin": MessageLookupByLibrary.simpleMessage("PIN 验证"),

@@ -177,6 +177,20 @@ class _SettingsState extends State<Settings> {
                       ),
                     ),
                   ),
+                  InkWell(
+                    onTap: () => fixNFC(),
+                    borderRadius: BorderRadius.circular(30.0),
+                    child: Material(
+                      elevation: 1.0,
+                      borderRadius: BorderRadius.circular(30.0),
+                      child: Container(
+                        padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(30.0), color: Colors.red),
+                        child:
+                        Text(S.of(context).settingsFixNFC, style: TextStyle(color: Colors.white, fontSize: 15.0, fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                  ),
                 ],
                 InkWell(
                   onTap: showResetDialog,
@@ -936,6 +950,16 @@ class _SettingsState extends State<Settings> {
       } else {
         Commons.promptFailure('Unknown error');
       }
+    });
+  }
+
+  void fixNFC() async {
+    Commons.process(context, () async {
+      Commons.assertOK(await FlutterNfcKit.transceive('00A4040005F000000000'));
+      if (!await verifyPin(this.pin!)) return;
+      Commons.assertOK(await FlutterNfcKit.transceive('00FF01000603A044000420'));
+      Commons.assertOK(await FlutterNfcKit.transceive('00FF01000903B005720300B39900'));
+      Commons.promptSuccess(S.of(context).settingsFixNFCSuccess);
     });
   }
 

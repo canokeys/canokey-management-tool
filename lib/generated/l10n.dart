@@ -810,6 +810,26 @@ class S {
     );
   }
 
+  /// `Fix NFC`
+  String get settingsFixNFC {
+    return Intl.message(
+      'Fix NFC',
+      name: 'settingsFixNFC',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `NFC is successfully fixed`
+  String get settingsFixNFCSuccess {
+    return Intl.message(
+      'NFC is successfully fixed',
+      name: 'settingsFixNFCSuccess',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `This action will delete the account {name} from your CanoKey. Make sure 2FA has been disabled on the web service.`
   String oathDelete(Object name) {
     return Intl.message(
