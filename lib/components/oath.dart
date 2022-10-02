@@ -355,7 +355,7 @@ class _OATHState extends State<OATH> {
                                   if (secretKeyController.text.length > 52) secretKey = S.of(context).oathTooLong;
                                   late String secretHex;
                                   try {
-                                    secretHex = base32.decodeAsHexString(secretKeyController.text);
+                                    secretHex = base32.decodeAsHexString(secretKeyController.text.toUpperCase());
                                   } catch (e) {
                                     secretKey = S.of(context).oathInvalidKey;
                                   }
