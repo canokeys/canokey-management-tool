@@ -78,6 +78,13 @@ class _SettingsState extends State<Settings> {
               if (key!.functionSet().contains(Func.hotp))
                 itemTile(width, Icons.keyboard_alt_outlined, S.of(context).settingsHotp, key!.hotpOn ? S.of(context).on : S.of(context).off,
                     () => showChangeSwitchDialog(S.of(context).settingsHotp, Func.hotp, key!.hotpOn)),
+              if (key!.functionSet().contains(Func.keyboardWithReturn))
+                itemTile(
+                    width,
+                    Icons.keyboard_alt_outlined,
+                    S.of(context).settingsKeyboardWithReturn,
+                    key!.keyboardWithReturn ? S.of(context).on : S.of(context).off,
+                    () => showChangeSwitchDialog(S.of(context).settingsKeyboardWithReturn, Func.keyboardWithReturn, key!.keyboardWithReturn)),
               if (key!.functionSet().contains(Func.webusbLandingPage))
                 itemTile(width, Icons.web, S.of(context).settingsWebUSB, key!.webusbLandingEnabled ? S.of(context).on : S.of(context).off,
                     () => showChangeSwitchDialog(S.of(context).settingsWebUSB, Func.webusbLandingPage, key!.webusbLandingEnabled)),
@@ -130,8 +137,7 @@ class _SettingsState extends State<Settings> {
                       child: Container(
                         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
                         decoration: BoxDecoration(borderRadius: BorderRadius.circular(30.0), color: Colors.red),
-                        child: Text(S.of(context).settingsResetOpenPGP,
-                            style: TextStyle(color: Colors.white, fontSize: 15.0, fontWeight: FontWeight.bold)),
+                        child: Text(S.of(context).settingsResetOpenPGP, style: TextStyle(color: Colors.white, fontSize: 15.0, fontWeight: FontWeight.bold)),
                       ),
                     ),
                   ),
@@ -144,8 +150,7 @@ class _SettingsState extends State<Settings> {
                       child: Container(
                         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
                         decoration: BoxDecoration(borderRadius: BorderRadius.circular(30.0), color: Colors.red),
-                        child:
-                            Text(S.of(context).settingsResetPIV, style: TextStyle(color: Colors.white, fontSize: 15.0, fontWeight: FontWeight.bold)),
+                        child: Text(S.of(context).settingsResetPIV, style: TextStyle(color: Colors.white, fontSize: 15.0, fontWeight: FontWeight.bold)),
                       ),
                     ),
                   ),
@@ -158,8 +163,7 @@ class _SettingsState extends State<Settings> {
                       child: Container(
                         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
                         decoration: BoxDecoration(borderRadius: BorderRadius.circular(30.0), color: Colors.red),
-                        child:
-                            Text(S.of(context).settingsResetOATH, style: TextStyle(color: Colors.white, fontSize: 15.0, fontWeight: FontWeight.bold)),
+                        child: Text(S.of(context).settingsResetOATH, style: TextStyle(color: Colors.white, fontSize: 15.0, fontWeight: FontWeight.bold)),
                       ),
                     ),
                   ),
@@ -172,8 +176,7 @@ class _SettingsState extends State<Settings> {
                       child: Container(
                         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
                         decoration: BoxDecoration(borderRadius: BorderRadius.circular(30.0), color: Colors.red),
-                        child:
-                            Text(S.of(context).settingsResetNDEF, style: TextStyle(color: Colors.white, fontSize: 15.0, fontWeight: FontWeight.bold)),
+                        child: Text(S.of(context).settingsResetNDEF, style: TextStyle(color: Colors.white, fontSize: 15.0, fontWeight: FontWeight.bold)),
                       ),
                     ),
                   ),
@@ -186,8 +189,7 @@ class _SettingsState extends State<Settings> {
                       child: Container(
                         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
                         decoration: BoxDecoration(borderRadius: BorderRadius.circular(30.0), color: Colors.red),
-                        child:
-                        Text(S.of(context).settingsFixNFC, style: TextStyle(color: Colors.white, fontSize: 15.0, fontWeight: FontWeight.bold)),
+                        child: Text(S.of(context).settingsFixNFC, style: TextStyle(color: Colors.white, fontSize: 15.0, fontWeight: FontWeight.bold)),
                       ),
                     ),
                   ),
@@ -848,19 +850,21 @@ class _SettingsState extends State<Settings> {
       }
       this.pin = pin;
       // read configurations
+      FunctionSetVersion functionSetVersion = CanoKey.functionSetFromFirmwareVersion(firmwareVersion);
       bool ledOn = false;
       bool hotpOn = false;
       bool ndefReadonly = false;
       bool ndefEnabled = false;
       bool webusbLandingEnabled = false;
+      bool keyboardWithReturn = false;
       bool sigTouch = false;
       bool decTouch = false;
       bool autTouch = false;
       int cacheTime = 0;
       resp = await FlutterNfcKit.transceive('0042000000');
       Commons.assertOK(resp);
-      switch (CanoKey.functionSetFromFirmwareVersion(firmwareVersion)) {
-        case FunctionSet.v1:
+      switch (functionSetVersion) {
+        case FunctionSetVersion.v1:
           ledOn = resp.substring(0, 2) == '01';
           hotpOn = resp.substring(2, 4) == '01';
           ndefReadonly = resp.substring(4, 6) == '01';
@@ -869,17 +873,25 @@ class _SettingsState extends State<Settings> {
           autTouch = resp.substring(10, 12) == '01';
           cacheTime = int.parse(resp.substring(12, 14), radix: 16);
           break;
-        case FunctionSet.v2:
+        case FunctionSetVersion.v2:
           ledOn = resp.substring(0, 2) == '01';
           hotpOn = resp.substring(2, 4) == '01';
           ndefReadonly = resp.substring(4, 6) == '01';
           ndefEnabled = resp.substring(6, 8) == '01';
           webusbLandingEnabled = resp.substring(8, 10) == '01';
           break;
+        case FunctionSetVersion.v3:
+          ledOn = resp.substring(0, 2) == '01';
+          hotpOn = resp.substring(2, 4) == '01';
+          ndefReadonly = resp.substring(4, 6) == '01';
+          ndefEnabled = resp.substring(6, 8) == '01';
+          webusbLandingEnabled = resp.substring(8, 10) == '01';
+          keyboardWithReturn = resp.substring(10, 12) == '01';
+          break;
       }
       setState(() {
-        key = CanoKey(model, sn, chipId, firmwareVersion, ledOn, hotpOn, ndefReadonly, ndefEnabled, webusbLandingEnabled, sigTouch, decTouch,
-            autTouch, cacheTime);
+        key = CanoKey(model, sn, chipId, firmwareVersion, functionSetVersion, ledOn, hotpOn, ndefReadonly, ndefEnabled, webusbLandingEnabled,
+            keyboardWithReturn, sigTouch, decTouch, autTouch, cacheTime);
       });
     });
   }
@@ -969,6 +981,7 @@ class _SettingsState extends State<Settings> {
     Func.ndefEnabled: {true: '00400401', false: '00400400'},
     Func.ndefReadonly: {true: '00080100', false: '00080000'},
     Func.webusbLandingPage: {true: '00400501', false: '00400500'},
+    Func.keyboardWithReturn: {true: '00400601', false: '00400600'},
     Func.sigTouch: {true: '00090001', false: '00090000'},
     Func.decTouch: {true: '00090101', false: '00090100'},
     Func.autTouch: {true: '00090201', false: '00090200'},
@@ -984,11 +997,12 @@ class _SettingsState extends State<Settings> {
 
 enum Applet { OpenPGP, PIV, WebAuthn, OATH, NDEF }
 
-enum Func { led, hotp, ndefEnabled, ndefReadonly, webusbLandingPage, sigTouch, decTouch, autTouch, touchCacheTime }
+enum Func { led, hotp, ndefEnabled, ndefReadonly, webusbLandingPage, keyboardWithReturn, sigTouch, decTouch, autTouch, touchCacheTime }
 
-enum FunctionSet {
+enum FunctionSetVersion {
   v1, // led, hotp, ndef readonly, sig/dec/aut touch, touch cache time
   v2, // led, hotp, ndef enabled/readonly, webusb landing page
+  v3, // led, hotp, ndef enabled/readonly, webusb landing page, hotp return switch
 }
 
 class CanoKey {
@@ -996,30 +1010,41 @@ class CanoKey {
   final String sn;
   final String chipId;
   final String firmwareVersion;
+  final FunctionSetVersion functionSetVersion;
   final bool ledOn;
   final bool hotpOn;
   final bool ndefReadonly;
   final bool ndefEnabled;
   final bool webusbLandingEnabled;
+  final bool keyboardWithReturn;
   final bool sigTouch;
   final bool decTouch;
   final bool autTouch;
   final int touchCacheTime;
 
-  CanoKey(this.model, this.sn, this.chipId, this.firmwareVersion, this.ledOn, this.hotpOn, this.ndefReadonly, this.ndefEnabled,
-      this.webusbLandingEnabled, this.sigTouch, this.decTouch, this.autTouch, this.touchCacheTime);
+  CanoKey(this.model, this.sn, this.chipId, this.firmwareVersion, this.functionSetVersion, this.ledOn, this.hotpOn, this.ndefReadonly, this.ndefEnabled,
+      this.webusbLandingEnabled, this.keyboardWithReturn, this.sigTouch, this.decTouch, this.autTouch, this.touchCacheTime);
 
   Set<Func> functionSet() {
-    if (firmwareVersion.compareTo('1.5.') < 0) {
-      return {Func.led, Func.hotp, Func.ndefReadonly, Func.sigTouch, Func.decTouch, Func.autTouch, Func.touchCacheTime};
+    switch (functionSetVersion) {
+      case FunctionSetVersion.v1:
+        return {Func.led, Func.hotp, Func.ndefReadonly, Func.sigTouch, Func.decTouch, Func.autTouch, Func.touchCacheTime};
+      case FunctionSetVersion.v2:
+        return {Func.led, Func.hotp, Func.webusbLandingPage, Func.ndefEnabled, Func.ndefReadonly};
+      case FunctionSetVersion.v3:
+        return {Func.led, Func.hotp, Func.webusbLandingPage, Func.ndefEnabled, Func.ndefReadonly, Func.keyboardWithReturn};
     }
-    return {Func.led, Func.hotp, Func.webusbLandingPage, Func.ndefEnabled, Func.ndefReadonly};
   }
 
-  static FunctionSet functionSetFromFirmwareVersion(String firmwareVersion) {
+  static FunctionSetVersion functionSetFromFirmwareVersion(String firmwareVersion) {
     if (firmwareVersion.compareTo('1.5.') < 0) {
-      return FunctionSet.v1;
+      log.info("Function Set: V1");
+      return FunctionSetVersion.v1;
+    } else if (firmwareVersion.compareTo('1.6.2') < 0) {
+      log.info("Function Set: V2");
+      return FunctionSetVersion.v2;
     }
-    return FunctionSet.v2;
+    log.info("Function Set: V3");
+    return FunctionSetVersion.v3;
   }
 }

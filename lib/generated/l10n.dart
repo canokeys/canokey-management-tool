@@ -830,6 +830,16 @@ class S {
     );
   }
 
+  /// `The output of OTP value comes with enter`
+  String get settingsKeyboardWithReturn {
+    return Intl.message(
+      'The output of OTP value comes with enter',
+      name: 'settingsKeyboardWithReturn',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `This action will delete the account {name} from your CanoKey. Make sure 2FA has been disabled on the web service.`
   String oathDelete(Object name) {
     return Intl.message(
