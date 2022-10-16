@@ -130,6 +130,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "settingsInputPin": MessageLookupByLibrary.simpleMessage("PIN 验证"),
         "settingsInputPinPrompt": MessageLookupByLibrary.simpleMessage(
             "请输入您的 PIN（默认值为 123456）。请注意，该 PIN 与其他应用的 PIN 无关。"),
+        "settingsKeyboardWithReturn":
+            MessageLookupByLibrary.simpleMessage("OTP 输出后附加回车"),
         "settingsLanguage": MessageLookupByLibrary.simpleMessage("语言"),
         "settingsModel": MessageLookupByLibrary.simpleMessage("型号"),
         "settingsNDEF": MessageLookupByLibrary.simpleMessage("NFC 标签模式 (NDEF)"),
