@@ -1,4 +1,4 @@
-name: canokey-management-tool
+name: Build
 
 on:
   push:
@@ -17,13 +17,13 @@ jobs:
         channel: 'stable'
     - run: git clone https://github.com/canokeys/canokey-management-tool
     - run: cd canokey-management-tool && flutter pub get
-    - run: cd canokey-management-tool && flutter build web
+    - run: cd canokey-management-tool && flutter build web --web-renderer html
 
     - name: Archive code coverage results #上传build文件
       uses: actions/upload-artifact@v3
       with:
         name: web
-        path: ${{ github.workspace }}/canokey-management-tool/build/web*
+        path: ${{ github.workspace }}/canokey-management-tool/build/web
 
     - name: Deploy #部署到web分支
       uses: s0/git-publish-subdir-action@develop
