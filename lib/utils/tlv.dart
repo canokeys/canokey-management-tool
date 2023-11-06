@@ -19,7 +19,7 @@ class TLV {
       if (off + lengthCount + length > len) {
         throw FormatException("Illegal TLV length");
       }
-      if (tag == 0x73) { // OpenPGP
+      if (tag == 0x73 || tag == 0x6E || tag == 0x65) { // OpenPGP
         result[tag] = _parse(buf, off + lengthCount, off + lengthCount + length);
       } else {
         result[tag] = buf.sublist(off + lengthCount, off + lengthCount + length);
