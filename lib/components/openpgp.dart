@@ -534,6 +534,8 @@ class _OpenPGPState extends State<OpenPGP> {
       String resp = await transceive('00CA006E00');
       Commons.assertOK(resp);
       Map info = TLV.parse(hex.decode(Commons.dropSW(resp)));
+      if (info.containsKey(0x6E)) // constructed DOs
+        info = TLV.parse(info[0x6E]);
       Uint8List aid = info[0x4F];
       String version = '${aid[6]}.${aid[7]}';
       int manufacturerId = (aid[8] << 8) | aid[9];
@@ -579,6 +581,8 @@ class _OpenPGPState extends State<OpenPGP> {
       resp = await transceive('00CA006500');
       Commons.assertOK(resp);
       info = TLV.parse(hex.decode(Commons.dropSW(resp)));
+      if (info.containsKey(0x65)) // constructed DOs
+        info = TLV.parse(info[0x65]);
       String name = String.fromCharCodes(info[0x5B]);
 
       setState(() {
