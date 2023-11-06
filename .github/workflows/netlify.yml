@@ -9,15 +9,15 @@ jobs:
       - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.3.3'
           channel: 'stable'
-      - run: git clone https://github.com/canokeys/canokey-management-tool
-      - run: cd canokey-management-tool && flutter pub get
-      - run: cd canokey-management-tool && flutter build web --web-renderer html
+      - run: flutter pub get
+      - run: flutter build web --web-renderer html
 
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v1.2
         with:
-          publish-dir: ${{ github.workspace }}/canokey-management-tool/build/web
+          publish-dir: ${{ github.workspace }}/build/web
           production-branch: master
           github-token: ${{ secrets.GITHUB_TOKEN }}
           deploy-message: "Deploy from GitHub Actions"
