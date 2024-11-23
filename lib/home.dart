@@ -35,11 +35,11 @@ class Home extends StatelessWidget {
             ),
             SizedBox(height: 50.0),
             InkWell(
-              onTap: () => launchUrl(Uri.parse('https://console-legacy.canokeys.org')),
+              onTap: () => launchUrl(Uri.parse('https://console-vue.canokeys.org')),
               child: Container(
                 alignment: Alignment.center,
                 padding: EdgeInsets.all(10.0),
-                child: Text('Use Old Version', style: TextStyle(fontWeight: FontWeight.bold)),
+                child: Text('Use Older Version', style: TextStyle(fontWeight: FontWeight.bold)),
               ),
             ),
           ],
